@@ -21,7 +21,7 @@
       --shadow:      0 2px 16px rgba(26,107,60,0.10);
       --radius:      12px;
     }
-    html { font-size:17px; }
+    html { font-size:18px; }
     body { font-family:'Tajawal',sans-serif; background:var(--gray-bg); color:var(--gray-dark); min-height:100vh; direction:rtl; line-height:1.6; }
 
     /* HEADER */
@@ -92,6 +92,7 @@
       transition:border-color .2s, box-shadow .2s; outline:none; appearance:none; -webkit-appearance:none;
     }
     input:focus, select:focus, textarea:focus { border-color:var(--green-mid); box-shadow:0 0 0 3px rgba(45,158,95,0.12); }
+    select:disabled { background:#f3f4f6; color:var(--gray-mid); cursor:not-allowed; }
     input.error, select.error, textarea.error { border-color:var(--error); box-shadow:0 0 0 3px rgba(220,38,38,0.08); }
     .error-msg { font-size:0.85rem; color:var(--error); display:none; }
     .error-msg.show { display:block; }
@@ -195,7 +196,7 @@
         </div>
         <div class="field">
           <label for="age">العمر <span class="req">*</span></label>
-          <input type="number" id="age" placeholder="السن بالسنوات" min="1" max="120"/>
+          <input type="number" id="age" min="1" max="120"/>
           <span class="error-msg" id="err-age">الرجاء إدخال عمر صحيح</span>
         </div>
         <div class="field">
@@ -224,20 +225,29 @@
           <div class="select-wrap">
             <select id="country">
               <option value="">-- اختر البلد --</option>
-              <option>المملكة العربية السعودية</option><option>اليمن</option><option>سوريا</option>
-              <option>فلسطين</option><option>لبنان</option><option>الأردن</option><option>العراق</option>
-              <option>السودان</option><option>الصومال</option><option>ليبيا</option>
-              <option>أفغانستان</option><option>باكستان</option><option>مصر</option>
-              <option>المغرب</option><option>تونس</option><option>موريتانيا</option>
-              <option>النيجر</option><option>مالي</option><option>إثيوبيا</option><option>أخرى</option>
+              <option>سوريا</option>
+              <option>العراق</option>
+              <option>فلسطين</option>
+              <option>لبنان</option>
+              <option>السودان</option>
+              <option>الصومال</option>
+              <option>السعودية</option>
+              <option>مصر</option>
+              <option>تونس</option>
+              <option>الأردن</option>
+              <option>المغرب</option>
             </select>
           </div>
           <span class="error-msg" id="err-country">الرجاء اختيار البلد</span>
         </div>
         <div class="field">
-          <label for="residence">مكان الإقامة الحالي <span class="req">*</span></label>
-          <input type="text" id="residence" placeholder="المدينة / المنطقة / المخيم"/>
-          <span class="error-msg" id="err-residence">الرجاء إدخال مكان الإقامة</span>
+          <label for="residence">المدينة <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="residence" disabled>
+              <option value="">-- اختر البلد أولاً --</option>
+            </select>
+          </div>
+          <span class="error-msg" id="err-residence">الرجاء اختيار المدينة</span>
         </div>
       </div>
     </div>
@@ -324,6 +334,35 @@
 <footer>© 2025 مركز الملك سلمان للإغاثة والأعمال الإنسانية &nbsp;|&nbsp; جميع الحقوق محفوظة</footer>
 
 <script>
+  const citiesByCountry = {
+    'سوريا': ['دمشق (الشام)', 'ريف دمشق', 'درعا', 'السويداء', 'القنيطرة', 'حمص', 'حماة', 'حلب', 'إدلب', 'اللاذقية', 'طرطوس', 'الرقة', 'دير الزور', 'الحسكة'],
+    'العراق': ['بغداد', 'البصرة', 'نينوى', 'أربيل', 'السليمانية', 'دهوك', 'كركوك', 'الأنبار', 'صلاح الدين', 'ديالى', 'بابل', 'كربلاء', 'النجف', 'واسط', 'ميسان', 'ذي قار', 'المثنى', 'القادسية'],
+    'فلسطين': ['القدس', 'غزة', 'الخليل', 'نابلس', 'رام الله والبيرة', 'بيت لحم', 'جنين', 'طولكرم', 'قلقيلية', 'أريحا', 'سلفيت', 'رفح', 'خان يونس', 'دير البلح', 'شمال غزة'],
+    'لبنان': ['بيروت', 'طرابلس', 'صيدا', 'صور', 'زحلة', 'بعلبك', 'جبيل', 'جونية', 'النبطية', 'عكار', 'بشري', 'بعبدا', 'عاليه', 'الشوف', 'الهرمل'],
+    'السودان': ['الخرطوم', 'أم درمان', 'بحري', 'الجزيرة', 'كسلا', 'القضارف', 'بورتسودان', 'سنار', 'النيل الأبيض', 'النيل الأزرق', 'نهر النيل', 'الشمالية', 'شمال كردفان', 'جنوب كردفان', 'غرب كردفان', 'شمال دارفور', 'جنوب دارفور', 'شرق دارفور', 'غرب دارفور', 'وسط دارفور'],
+    'الصومال': ['مقديشو', 'هرجيسا', 'بوصاصو', 'كسمايو', 'بيدوا', 'غالكعيو', 'بلدوين', 'جوهر', 'مركا', 'بربرة', 'بورعو', 'غاروي', 'أفجوي'],
+    'السعودية': ['الرياض', 'جدة', 'مكة المكرمة', 'المدينة المنورة', 'الدمام', 'الخبر', 'الطائف', 'تبوك', 'بريدة', 'عنيزة', 'حائل', 'أبها', 'خميس مشيط', 'جازان', 'نجران', 'الباحة', 'سكاكا', 'عرعر', 'ينبع', 'الأحساء', 'القطيف'],
+    'مصر': ['القاهرة', 'الجيزة', 'الإسكندرية', 'القليوبية', 'الدقهلية', 'الشرقية', 'الغربية', 'المنوفية', 'البحيرة', 'كفر الشيخ', 'دمياط', 'بورسعيد', 'الإسماعيلية', 'السويس', 'الفيوم', 'بني سويف', 'المنيا', 'أسيوط', 'سوهاج', 'قنا', 'الأقصر', 'أسوان', 'البحر الأحمر', 'الوادي الجديد', 'مطروح', 'شمال سيناء', 'جنوب سيناء'],
+    'تونس': ['تونس', 'أريانة', 'بن عروس', 'منوبة', 'نابل', 'زغوان', 'بنزرت', 'باجة', 'جندوبة', 'الكاف', 'سليانة', 'سوسة', 'المنستير', 'المهدية', 'صفاقس', 'القيروان', 'القصرين', 'سيدي بوزيد', 'قابس', 'مدنين', 'تطاوين', 'قفصة', 'توزر', 'قبلي'],
+    'الأردن': ['عمّان', 'الزرقاء', 'إربد', 'العقبة', 'البلقاء', 'مادبا', 'جرش', 'عجلون', 'المفرق', 'الكرك', 'الطفيلة', 'معان'],
+    'المغرب': ['الرباط', 'الدار البيضاء', 'مراكش', 'فاس', 'طنجة', 'مكناس', 'أكادير', 'وجدة', 'تطوان', 'القنيطرة', 'سلا', 'تمارة', 'الجديدة', 'آسفي', 'بني ملال', 'خريبكة', 'الناظور', 'الحسيمة', 'العيون', 'الداخلة', 'ورزازات', 'الرشيدية']
+  };
+
+  function updateCities() {
+    const country = document.getElementById('country').value;
+    const residence = document.getElementById('residence');
+    const cities = citiesByCountry[country] || [];
+
+    residence.innerHTML = cities.length
+      ? '<option value="">-- اختر المدينة --</option>' + cities.map(city => `<option value="${city}">${city}</option>`).join('')
+      : '<option value="">-- اختر البلد أولاً --</option>';
+    residence.disabled = cities.length === 0;
+    residence.classList.remove('error');
+    document.getElementById('err-residence').classList.remove('show');
+  }
+
+  document.getElementById('country').addEventListener('change', updateCities);
+
   function toggleFamilySize() {
     const val = document.getElementById('maritalStatus').value;
     const f   = document.getElementById('familySizeField');
@@ -354,7 +393,7 @@
     ok = setError('age',          'err-age',          isNaN(age)||age<1||age>120) && ok;
     ok = setError('nationality',  'err-nationality',  !document.getElementById('nationality').value)    && ok;
     ok = setError('country',      'err-country',      !document.getElementById('country').value)                         && ok;
-    ok = setError('residence',    'err-residence',    document.getElementById('residence').value.trim().length < 2)      && ok;
+    ok = setError('residence',    'err-residence',    !document.getElementById('residence').value)                       && ok;
     const ms = document.getElementById('maritalStatus').value;
     ok = setError('maritalStatus','err-maritalStatus',!ms) && ok;
     if (ms === 'married') {
@@ -400,7 +439,7 @@
       age:          document.getElementById('age').value,
       nationality:  nat.options[nat.selectedIndex].text,
       country:      document.getElementById('country').value,
-      residence:    document.getElementById('residence').value.trim(),
+      residence:    document.getElementById('residence').value,
       maritalStatus: ms.options[ms.selectedIndex].text,
       familySize:   document.getElementById('familySize').value || '—',
       hasSalary:    document.querySelector('input[name="hasSalary"]:checked').value === 'yes' ? 'نعم' : 'لا',
