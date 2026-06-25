@@ -8,26 +8,26 @@
   <style>
     *, *::before, *::after { box-sizing:border-box; }
     :root {
-      --green-dark:#14532d;
-      --green:#2d9e5f;
-      --green-light:#e8f5ee;
-      --border:#e5e7eb;
-      --muted:#6b7280;
-      --background:#f3f6f4;
-      --white:#fff;
-      --danger:#b91c1c;
+      --green-dark:#0b1739;
+      --green:#1d4ed8;
+      --green-light:#172554;
+      --border:#263556;
+      --muted:#aab6cf;
+      --background:#080d18;
+      --white:#111827;
+      --danger:#f87171;
     }
     body {
       margin:0;
       min-height:100vh;
       background:var(--background);
-      color:#1f2937;
+      color:#e5e7eb;
       font:18px/1.6 'Tajawal', sans-serif;
     }
     header {
-      background:linear-gradient(135deg,var(--green-dark),#0b3d20);
+      background:linear-gradient(135deg,#030712,#0b1739 60%,#10275c);
       color:#fff;
-      border-bottom:4px solid #c9a84c;
+      border-bottom:4px solid #2563eb;
     }
     .header-inner, main { width:min(1200px,calc(100% - 32px)); margin:auto; }
     .header-inner {
@@ -55,10 +55,11 @@
       gap:16px;
       margin-bottom:18px;
     }
-    .summary h2 { margin:0; color:var(--green-dark); font-size:1.25rem; }
+    .summary h2 { margin:0; color:#dbeafe; font-size:1.25rem; }
     .count {
       background:var(--green-light);
-      color:var(--green-dark);
+      color:#bfdbfe;
+      border:1px solid #29417a;
       border-radius:999px;
       padding:7px 16px;
       font-weight:700;
@@ -74,19 +75,20 @@
       background:var(--white);
       border:1px solid var(--border);
       border-radius:16px;
-      box-shadow:0 8px 25px rgba(20,83,45,.08);
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
       transition:transform .2s ease, box-shadow .2s ease;
     }
     .request-card:hover {
       transform:translateY(-4px);
-      box-shadow:0 14px 35px rgba(20,83,45,.14);
+      border-color:#3157a5;
+      box-shadow:0 16px 38px rgba(0,0,0,.5);
     }
     .card-head {
       display:flex;
       align-items:center;
       gap:12px;
       padding:18px;
-      background:linear-gradient(135deg,var(--green-dark),#17683a);
+      background:linear-gradient(135deg,#0a1020,#10275c);
       color:#fff;
     }
     .card-number {
@@ -117,11 +119,11 @@
     }
     .info-row:last-child { border-bottom:0; }
     .info-label { color:var(--muted); font-size:.86rem; font-weight:600; }
-    .info-value { color:#1f2937; font-size:.92rem; font-weight:700; overflow-wrap:anywhere; }
+    .info-value { color:#f3f4f6; font-size:.92rem; font-weight:700; overflow-wrap:anywhere; }
     .phone-value { direction:ltr; text-align:right; }
     .card-date {
       padding:11px 18px;
-      background:#f8faf9;
+      background:#0b1220;
       border-top:1px solid var(--border);
       color:var(--muted);
       font-size:.82rem;
@@ -247,6 +249,10 @@
               <div class="info-row">
                 <span class="info-label">الحالة الاجتماعية</span>
                 <span class="info-value">${escapeHtml(request.maritalStatus || request.status)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">الدخل الشهري</span>
+                <span class="info-value">${request.income ? `${escapeHtml(Number(request.income).toLocaleString('ar'))} ${escapeHtml(request.incomeCurrency)}` : 'لا يوجد'}</span>
               </div>
             </div>
             <div class="card-date">تاريخ الإرسال: ${escapeHtml(formatDate(request.createdAt))}</div>

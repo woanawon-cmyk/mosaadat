@@ -23,6 +23,12 @@
         "maritalStatus": {
           ".validate": "newData.val() === 'أعزب' || newData.val() === 'غير أعزب'"
         },
+        "income": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+        "incomeCurrency": {
+          ".validate": "newData.isString() && newData.val().length <= 80"
+        },
         "createdAt": {
           ".validate": "newData.isNumber()"
         },

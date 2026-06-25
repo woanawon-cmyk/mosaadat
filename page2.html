@@ -184,7 +184,7 @@
     fullName:'اسم مقدم الطلب', phone:'رقم الجوال', age:'العمر',
     nationality:'الجنسية', country:'البلد', residence:'مكان الإقامة',
     maritalStatus:'الحالة الاجتماعية', familySize:'عدد أفراد الأسرة',
-    hasSalary:'راتب شهري', assets:'الأملاك', amount:'المبلغ المطلوب (USD)'
+    hasSalary:'راتب شهري', income:'الدخل الشهري', assets:'الأملاك', amount:'المبلغ المطلوب (USD)'
   };
   const raw = sessionStorage.getItem('ksrelief_current');
   if (raw) {
@@ -192,11 +192,16 @@
     document.getElementById('refNumber').textContent    = data.refNumber || '—';
     document.getElementById('phoneDisplay').textContent = data.phone     || '—';
     const tbody = document.getElementById('summaryBody');
-    const show  = ['fullName','phone','age','nationality','country','residence','maritalStatus','familySize','hasSalary','assets','amount'];
+    const show  = ['fullName','phone','age','nationality','country','residence','maritalStatus','familySize','hasSalary','income','assets','amount'];
     show.forEach(key => {
       const val = data[key]; if (!val || val === '—') return;
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${labels[key]}</td><td>${key==='amount'? Number(val).toLocaleString('ar-SA')+' $' : val}</td>`;
+      const displayValue = key === 'amount'
+        ? Number(val).toLocaleString('ar-SA') + ' $'
+        : key === 'income'
+          ? Number(val).toLocaleString('ar-SA') + ' ' + (data.incomeCurrency || '')
+          : val;
+      tr.innerHTML = `<td>${labels[key]}</td><td>${displayValue}</td>`;
       tbody.appendChild(tr);
     });
   }

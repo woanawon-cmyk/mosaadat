@@ -273,10 +273,16 @@
         <div class="field">
           <label>هل لديك راتب شهري؟ <span class="req">*</span></label>
           <div class="radio-group">
-            <label class="radio-option"><input type="radio" name="hasSalary" value="yes"/><span>نعم، لديّ راتب</span></label>
-            <label class="radio-option"><input type="radio" name="hasSalary" value="no"/><span>لا، ليس لديّ راتب</span></label>
+            <label class="radio-option"><input type="radio" name="hasSalary" value="yes" onchange="toggleSalaryField()"/><span>نعم، لديّ راتب</span></label>
+            <label class="radio-option"><input type="radio" name="hasSalary" value="no" onchange="toggleSalaryField()"/><span>لا، ليس لديّ راتب</span></label>
           </div>
           <span class="error-msg" id="err-hasSalary">الرجاء تحديد هذا الخيار</span>
+        </div>
+        <div class="field conditional hidden" id="incomeField">
+          <label for="income">الدخل الشهري <span class="req">*</span></label>
+          <input type="number" id="income" placeholder="أدخل قيمة الدخل الشهري" min="0" step="0.01"/>
+          <span class="field-hint">العملة: <strong id="incomeCurrency">اختر البلد أولاً</strong></span>
+          <span class="error-msg" id="err-income">الرجاء إدخال دخل شهري صحيح</span>
         </div>
         <div class="field">
           <label>هل لديك أملاك؟ <span class="req">*</span></label>
@@ -348,6 +354,28 @@
     'المغرب': ['الرباط', 'الدار البيضاء', 'مراكش', 'فاس', 'طنجة', 'مكناس', 'أكادير', 'وجدة', 'تطوان', 'القنيطرة', 'سلا', 'تمارة', 'الجديدة', 'آسفي', 'بني ملال', 'خريبكة', 'الناظور', 'الحسيمة', 'العيون', 'الداخلة', 'ورزازات', 'الرشيدية']
   };
 
+  const currenciesByCountry = {
+    'سوريا': { name:'الليرة السورية الجديدة', code:'SYP', symbol:'ل.س' },
+    'العراق': { name:'الدينار العراقي', code:'IQD', symbol:'د.ع' },
+    'فلسطين': { name:'الشيكل', code:'ILS', symbol:'₪' },
+    'لبنان': { name:'الليرة اللبنانية', code:'LBP', symbol:'ل.ل' },
+    'السودان': { name:'الجنيه السوداني', code:'SDG', symbol:'ج.س' },
+    'الصومال': { name:'الشلن الصومالي', code:'SOS', symbol:'Sh.So' },
+    'السعودية': { name:'الريال السعودي', code:'SAR', symbol:'ر.س' },
+    'مصر': { name:'الجنيه المصري', code:'EGP', symbol:'ج.م' },
+    'تونس': { name:'الدينار التونسي', code:'TND', symbol:'د.ت' },
+    'الأردن': { name:'الدينار الأردني', code:'JOD', symbol:'د.أ' },
+    'المغرب': { name:'الدرهم المغربي', code:'MAD', symbol:'د.م' }
+  };
+
+  function updateIncomeCurrency() {
+    const country = document.getElementById('country').value;
+    const currency = currenciesByCountry[country];
+    document.getElementById('incomeCurrency').textContent = currency
+      ? `${currency.name} (${currency.symbol})`
+      : 'اختر البلد أولاً';
+  }
+
   function updateCities() {
     const country = document.getElementById('country').value;
     const residence = document.getElementById('residence');
@@ -359,6 +387,7 @@
     residence.disabled = cities.length === 0;
     residence.classList.remove('error');
     document.getElementById('err-residence').classList.remove('show');
+    updateIncomeCurrency();
   }
 
   document.getElementById('country').addEventListener('change', updateCities);
@@ -379,8 +408,26 @@
     else { f.classList.remove('visible'); f.classList.add('hidden'); document.getElementById('assets').value = ''; }
   }
 
+  function toggleSalaryField() {
+    const checked = document.querySelector('input[name="hasSalary"]:checked');
+    if (!checked) return;
+    const field = document.getElementById('incomeField');
+    if (checked.value === 'yes') {
+      field.classList.remove('hidden');
+      field.classList.add('visible');
+      updateIncomeCurrency();
+    } else {
+      field.classList.remove('visible');
+      field.classList.add('hidden');
+      document.getElementById('income').value = '';
+      document.getElementById('income').classList.remove('error');
+      document.getElementById('err-income').classList.remove('show');
+    }
+  }
+
   window.toggleFamilySize = toggleFamilySize;
   window.toggleAssetsField = toggleAssetsField;
+  window.toggleSalaryField = toggleSalaryField;
 
   function setError(id, errId, show) {
     const el = document.getElementById(id), err = document.getElementById(errId);
@@ -406,6 +453,10 @@
     const sal = document.querySelector('input[name="hasSalary"]:checked');
     document.getElementById('err-hasSalary').classList.toggle('show', !sal);
     if (!sal) ok = false;
+    if (sal && sal.value === 'yes') {
+      const income = parseFloat(document.getElementById('income').value);
+      ok = setError('income','err-income', isNaN(income)||income<0) && ok;
+    }
     
     const hasAssets = document.querySelector('input[name="hasAssets"]:checked');
     document.getElementById('err-hasAssets').classList.toggle('show', !hasAssets);
@@ -434,6 +485,8 @@
     const nat    = document.getElementById('nationality');
     const refNum = genRef();
     const submitButton = document.querySelector('.btn-submit');
+    const country = document.getElementById('country').value;
+    const currency = currenciesByCountry[country];
     const data   = {
       refNumber:    refNum,
       submittedAt:  new Date().toLocaleString('ar-SA'),
@@ -442,11 +495,15 @@
       phone:        document.getElementById('countryCode').value + document.getElementById('phone').value.trim(),
       age:          document.getElementById('age').value,
       nationality:  nat.options[nat.selectedIndex].text,
-      country:      document.getElementById('country').value,
+      country,
       residence:    document.getElementById('residence').value,
       maritalStatus: ms.options[ms.selectedIndex].text,
       familySize:   document.getElementById('familySize').value || '—',
       hasSalary:    document.querySelector('input[name="hasSalary"]:checked').value === 'yes' ? 'نعم' : 'لا',
+      income:       document.querySelector('input[name="hasSalary"]:checked').value === 'yes'
+                      ? document.getElementById('income').value
+                      : '—',
+      incomeCurrency: currency ? `${currency.name} (${currency.symbol})` : '—',
       assets:       document.querySelector('input[name="hasAssets"]:checked').value === 'yes'
                       ? document.getElementById('assets').value.trim()
                       : 'لا يوجد',
@@ -469,6 +526,8 @@
         country: data.country,
         city: data.residence,
         maritalStatus: ms.value === 'single' ? 'أعزب' : 'غير أعزب',
+        income: data.income === '—' ? 0 : Number(data.income),
+        incomeCurrency: data.incomeCurrency,
         createdAt: serverTimestamp()
       });
 
@@ -488,7 +547,7 @@
   });
 
   // Clear errors on input
-  ['fullName','phone','age','nationality','country','residence','maritalStatus','familySize','assets','amount'].forEach(id => {
+  ['fullName','phone','age','nationality','country','residence','maritalStatus','familySize','income','assets','amount'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', () => {
       el.classList.remove('error');
