@@ -170,24 +170,13 @@
         </div>
         <div class="field">
           <label for="phone">رقم الجوال <span class="req">*</span></label>
-          <div class="phone-row">
-            <div class="select-wrap" style="flex:0 0 100px;">
-              <select id="countryCode">
-                <option value="+963">سوريا +963</option>
-                <option value="+964">العراق +964</option>
-                <option value="+970">فلسطين +970</option>
-                <option value="+972">إسرائيل +972</option>
-                <option value="+20">مصر +20</option>
-                <option value="+961">لبنان +961</option>
-              </select>
-            </div>
-            <input type="tel" id="phone" placeholder="مثال: 963xxxxxxxxx" style="flex:1;"/>
-          </div>
+          <input type="tel" id="phone" placeholder="مثال: +963 9xxxxxxxx"/>
+          <span class="field-hint">أدخل رقم الجوال مع رمز الدولة</span>
           <span class="error-msg" id="err-phone">الرجاء إدخال رقم جوال صحيح</span>
         </div>
         <div class="field">
           <label for="age">العمر <span class="req">*</span></label>
-          <input type="number" id="age" min="1" max="120"/>
+          <input type="number" id="age" placeholder="مثلاً: 35 سنة" min="1" max="120"/>
           <span class="error-msg" id="err-age">الرجاء إدخال عمر صحيح</span>
         </div>
         <div class="field">
@@ -309,9 +298,9 @@
           الحد الأقصى للمبلغ المسموح بطلبه هو <strong>15,000 دولار أمريكي</strong> فقط.
         </div>
         <div class="field">
-          <label for="amount">المبلغ الذي تحتاجه لتغطية احتياجاتك (USD) <span class="req">*</span></label>
-          <input type="number" id="amount" placeholder="أدخل المبلغ المطلوب" min="1" max="15000"/>
-          <span class="field-hint">الحد الأقصى: 15,000 دولار</span>
+          <label for="amount">المبلغ الذي تحتاجه لتغطية احتياجاتك بالدولار الأمريكي (USD) <span class="req">*</span></label>
+          <input type="number" id="amount" placeholder="مثال: 1000 دولار أمريكي" min="1" max="15000"/>
+          <span class="field-hint">أدخل المبلغ بالدولار الأمريكي فقط — الحد الأقصى: 15,000 دولار</span>
           <span class="error-msg" id="err-amount">الرجاء إدخال مبلغ صحيح لا يتجاوز 15,000 دولار</span>
         </div>
       </div>
@@ -492,7 +481,7 @@
       submittedAt:  new Date().toLocaleString('ar-SA'),
       status:       'قيد المراجعة',
       fullName:     document.getElementById('fullName').value.trim(),
-      phone:        document.getElementById('countryCode').value + document.getElementById('phone').value.trim(),
+      phone:        document.getElementById('phone').value.trim(),
       age:          document.getElementById('age').value,
       nationality:  nat.options[nat.selectedIndex].text,
       country,
