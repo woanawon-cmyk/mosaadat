@@ -312,13 +312,13 @@
       <div class="grid-1">
         <div class="amount-note">
           <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
-          الحد الأقصى للمبلغ المسموح بطلبه هو <strong>15,000 دولار أمريكي</strong> فقط.
+          الحد الأقصى للمبلغ المسموح بطلبه هو <strong>26,000 دولار أمريكي</strong> فقط.
         </div>
         <div class="field">
           <label for="amount">المبلغ الذي تحتاجه لتغطية احتياجاتك بالدولار الأمريكي (USD) <span class="req">*</span></label>
-          <input type="number" id="amount" placeholder="مثال: 1000 دولار أمريكي" min="1" max="15000"/>
-          <span class="field-hint">أدخل المبلغ بالدولار الأمريكي فقط — الحد الأقصى: 15,000 دولار</span>
-          <span class="error-msg" id="err-amount">الرجاء إدخال مبلغ صحيح لا يتجاوز 15,000 دولار</span>
+          <input type="number" id="amount" placeholder="مثال: 1000 دولار أمريكي" min="1" max="26000"/>
+          <span class="field-hint">أدخل المبلغ بالدولار الأمريكي فقط — الحد الأقصى: 26,000 دولار</span>
+          <span class="error-msg" id="err-amount">الرجاء إدخال مبلغ صحيح لا يتجاوز 26,000 دولار</span>
         </div>
       </div>
     </div>
@@ -477,7 +477,7 @@
     }
     
     const amt = parseFloat(document.getElementById('amount').value);
-    ok = setError('amount','err-amount', isNaN(amt)||amt<=0||amt>15000) && ok;
+    ok = setError('amount','err-amount', isNaN(amt)||amt<=0||amt>26000) && ok;
     return ok;
   }
 
