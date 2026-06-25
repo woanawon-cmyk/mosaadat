@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>مركز الملك سلمان للإغاثة - لوحة التحكم</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --green-dark:   #1a6b3c;
+      --green-mid:    #2d9e5f;
+      --green-light:  #e8f5ee;
+      --white:        #ffffff;
+      --gray-bg:      #f2f4f3;
+      --gray-light:   #e4e8e6;
+      --gray-mid:     #6b7280;
+      --gray-dark:    #374151;
+      --gold:         #c9a84c;
+      --blue:         #3b82f6;
+      --blue-light:   #eff6ff;
+      --amber:        #f59e0b;
+      --amber-light:  #fffbeb;
+      --red:          #ef4444;
+      --red-light:    #fef2f2;
+      --shadow-sm:    0 1px 8px rgba(0,0,0,0.07);
+      --shadow-md:    0 2px 18px rgba(26,107,60,0.10);
+      --radius:       12px;
+    }
+    html { font-size:17px; }
+    body { font-family:'Tajawal',sans-serif; background:var(--gray-bg); color:var(--gray-dark); min-height:100vh; direction:rtl; line-height:1.6; }
+
+    /* ===== HEADER ===== */
+    header { background:linear-gradient(135deg,var(--green-dark) 0%,#0f4a28 100%); color:#fff; position:relative; overflow:hidden; }
+    header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--gold),#e8c96b,var(--gold)); }
+    .header-inner { max-width:1200px; margin:0 auto; padding:20px 24px 18px; display:flex; align-items:center; gap:16px; }
+    .logo-circle { width:56px; height:56px; border-radius:50%; background:rgba(255,255,255,0.10); border:2px solid rgba(201,168,76,0.5); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .logo-circle svg { width:30px; height:30px; }
+    .header-text h1 { font-size:1.25rem; font-weight:800; line-height:1.3; }
+    .header-text p  { font-size:0.78rem; color:rgba(255,255,255,0.6); margin-top:3px; }
+    .header-actions { margin-right:auto; display:flex; align-items:center; gap:10px; }
+    .btn-hdr { display:inline-flex; align-items:center; gap:7px; border-radius:8px; padding:9px 18px; font-family:'Tajawal',sans-serif; font-size:0.84rem; font-weight:600; cursor:pointer; transition:all .2s; text-decoration:none; border:none; }
+    .btn-hdr-outline { background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.28); color:#fff; }
+    .btn-hdr-outline:hover { background:rgba(255,255,255,0.2); }
+    .btn-hdr-solid { background:var(--gold); color:#1a1a1a; border:none; }
+    .btn-hdr-solid:hover { background:#d4b055; }
+
+    /* ===== MAIN ===== */
+    main { max-width:1200px; margin:0 auto; padding:28px 20px 60px; }
+
+    /* ===== STATS ===== */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    @media(max-width:900px){ .stats-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:500px){ .stats-grid{ grid-template-columns:1fr 1fr; } }
+
+    .stat-card {
+      background:#fff; border-radius:var(--radius); padding:20px 22px;
+      box-shadow:var(--shadow-sm); border:1px solid rgba(0,0,0,0.05);
+      display:flex; align-items:center; gap:16px;
+    }
+    .stat-icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .stat-icon.green  { background:var(--green-light); }
+    .stat-icon.blue   { background:var(--blue-light); }
+    .stat-icon.amber  { background:var(--amber-light); }
+    .stat-icon.red    { background:var(--red-light); }
+    .stat-num  { font-size:1.8rem; font-weight:800; line-height:1; color:var(--gray-dark); }
+    .stat-lbl  { font-size:0.78rem; color:var(--gray-mid); margin-top:4px; font-weight:500; }
+
+    /* ===== TOOLBAR ===== */
+    .toolbar {
+      background:#fff; border-radius:var(--radius); padding:16px 20px;
+      box-shadow:var(--shadow-sm); margin-bottom:18px;
+      display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    .search-wrap { position:relative; flex:1; min-width:200px; }
+    .search-wrap input {
+      width:100%; padding:9px 14px 9px 36px; border:1.5px solid var(--gray-light);
+      border-radius:8px; font-family:'Tajawal',sans-serif; font-size:0.875rem;
+      color:var(--gray-dark); outline:none; transition:border-color .2s;
+    }
+    .search-wrap input:focus { border-color:var(--green-mid); }
+    .search-wrap svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--gray-mid); }
+    .filter-select {
+      padding:9px 30px 9px 14px; border:1.5px solid var(--gray-light); border-radius:8px;
+      font-family:'Tajawal',sans-serif; font-size:0.875rem; color:var(--gray-dark);
+      background:#fff; outline:none; appearance:none; -webkit-appearance:none; cursor:pointer;
+    }
+    .select-mini-wrap { position:relative; }
+    .select-mini-wrap::after { content:'▾'; position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--gray-mid); pointer-events:none; font-size:0.8rem; }
+    .toolbar-right { display:flex; align-items:center; gap:8px; margin-right:auto; }
+    .count-badge { font-size:0.78rem; color:var(--gray-mid); font-weight:500; white-space:nowrap; }
+    .btn-export { display:inline-flex; align-items:center; gap:6px; background:var(--green-light); color:var(--green-dark); border:1px solid rgba(45,158,95,0.25); border-radius:8px; padding:8px 15px; font-family:'Tajawal',sans-serif; font-size:0.82rem; font-weight:700; cursor:pointer; transition:background .2s; }
+    .btn-export:hover { background:#d3eedf; }
+    .btn-clear-all { display:inline-flex; align-items:center; gap:6px; background:var(--red-light); color:var(--red); border:1px solid rgba(239,68,68,0.2); border-radius:8px; padding:8px 15px; font-family:'Tajawal',sans-serif; font-size:0.82rem; font-weight:700; cursor:pointer; transition:background .2s; }
+    .btn-clear-all:hover { background:#fde8e8; }
+
+    /* ===== TABLE WRAPPER ===== */
+    .table-card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:hidden; border:1px solid rgba(0,0,0,0.05); }
+    .table-scroll { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:900px; }
+    thead tr { background:linear-gradient(135deg,var(--green-dark),#0f4a28); }
+    thead th { padding:13px 16px; text-align:right; font-size:0.82rem; font-weight:700; color:rgba(255,255,255,0.9); white-space:nowrap; }
+    thead th:first-child { border-radius:0; }
+    tbody tr { transition:background .15s; border-bottom:1px solid var(--gray-bg); }
+    tbody tr:hover { background:#f9fafb; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody td { padding:13px 16px; font-size:0.875rem; color:var(--gray-dark); vertical-align:middle; white-space:nowrap; }
+    tbody td.wrap { white-space:normal; max-width:200px; font-size:0.82rem; }
+
+    /* ===== STATUS BADGE ===== */
+    .badge { display:inline-flex; align-items:center; gap:5px; border-radius:20px; padding:4px 12px; font-size:0.78rem; font-weight:700; }
+    .badge-review { background:var(--amber-light); color:#92400e; border:1px solid #fde68a; }
+    .badge-accept { background:var(--green-light); color:var(--green-dark); border:1px solid #a7f3d0; }
+    .badge-reject { background:var(--red-light);   color:#991b1b; border:1px solid #fca5a5; }
+    .badge-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+    /* ===== ACTION BTNS ===== */
+    .action-cell { display:flex; gap:6px; }
+    .btn-status { border:none; border-radius:6px; padding:5px 10px; font-family:'Tajawal',sans-serif; font-size:0.75rem; font-weight:700; cursor:pointer; transition:all .15s; }
+    .btn-accept { background:var(--green-light); color:var(--green-dark); }
+    .btn-accept:hover { background:#c6e8d4; }
+    .btn-reject { background:var(--red-light); color:var(--red); }
+    .btn-reject:hover { background:#fcd9d9; }
+    .btn-delete { background:#f3f4f6; color:var(--gray-mid); }
+    .btn-delete:hover { background:#fde8e8; color:var(--red); }
+    .btn-view { background:var(--blue-light); color:var(--blue); }
+    .btn-view:hover { background:#dbeafe; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state { text-align:center; padding:64px 20px; }
+    .empty-icon { width:80px; height:80px; border-radius:50%; background:var(--green-light); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; }
+    .empty-title { font-size:1.1rem; font-weight:700; color:var(--gray-dark); margin-bottom:8px; }
+    .empty-sub   { font-size:0.875rem; color:var(--gray-mid); }
+
+    /* ===== MODAL ===== */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999; align-items:center; justify-content:center; padding:16px; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#fff; border-radius:16px; max-width:560px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); animation:slideUp .3s ease; }
+    @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .modal-header { background:linear-gradient(135deg,var(--green-dark),#0f4a28); color:#fff; padding:20px 24px; border-radius:16px 16px 0 0; display:flex; align-items:center; justify-content:space-between; }
+    .modal-header h3 { font-size:1.05rem; font-weight:800; }
+    .modal-close { background:rgba(255,255,255,0.12); border:none; color:#fff; width:30px; height:30px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1.1rem; transition:background .2s; }
+    .modal-close:hover { background:rgba(255,255,255,0.25); }
+    .modal-body { padding:24px; }
+    .modal-ref { font-size:0.78rem; color:var(--gray-mid); margin-bottom:16px; }
+    .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media(max-width:480px){ .detail-grid{ grid-template-columns:1fr; } }
+    .detail-item { background:var(--gray-bg); border-radius:8px; padding:12px 14px; }
+    .detail-lbl { font-size:0.72rem; color:var(--gray-mid); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:.04em; }
+    .detail-val { font-size:0.9rem; font-weight:700; color:var(--gray-dark); word-break:break-word; }
+    .detail-full { grid-column:1/-1; }
+    .modal-footer { padding:16px 24px; border-top:1px solid var(--gray-light); display:flex; gap:10px; justify-content:flex-end; }
+
+    /* ===== TOAST ===== */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e1e1e; color:#fff; border-radius:10px; padding:12px 22px; font-size:0.875rem; font-weight:600; z-index:9999; transition:transform .3s ease; box-shadow:0 4px 20px rgba(0,0,0,0.25); display:flex; align-items:center; gap:8px; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+    .toast.success { background:var(--green-dark); }
+    .toast.error   { background:var(--red); }
+
+    footer { text-align:center; padding:18px; font-size:0.85rem; color:var(--gray-mid); border-top:1px solid var(--gray-light); }
+    @media(max-width:600px){
+      .header-inner { padding:16px 12px 14px; gap:10px; flex-wrap:wrap; }
+      .header-text { flex:1; min-width:0; }
+      .header-text h1 { font-size:1.1rem; }
+      .header-text p { font-size:0.82rem; }
+      .logo-circle { width:48px; height:48px; }
+      .header-actions { width:100%; margin:0; }
+      .btn-hdr { width:100%; justify-content:center; font-size:0.95rem; }
+      main { padding:20px 10px 40px; }
+      .stats-grid { grid-template-columns:1fr; gap:12px; }
+      .stat-card { padding:16px; }
+      .stat-lbl, .count-badge { font-size:0.9rem; }
+      .toolbar { padding:14px; align-items:stretch; }
+      .search-wrap, .select-mini-wrap, .filter-select, .toolbar-right { width:100%; }
+      .search-wrap input, .filter-select { font-size:1rem; min-height:46px; }
+      .toolbar-right { margin:0; flex-wrap:wrap; }
+      .btn-export, .btn-clear-all { flex:1; justify-content:center; font-size:0.9rem; min-height:42px; }
+      thead th, tbody td { font-size:0.9rem; }
+      .modal-body { padding:18px 14px; }
+      .detail-lbl { font-size:0.82rem; }
+      .detail-val { font-size:1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-circle">
+      <svg viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" stroke="#c9a84c" stroke-width="1.5"/>
+        <path d="M10 22 Q20 8 30 22" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M13 28 Q20 18 27 28" stroke="#c9a84c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <circle cx="20" cy="14" r="3" fill="white"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>لوحة تحكم الطلبات</h1>
+      <p>مركز الملك سلمان للإغاثة والأعمال الإنسانية</p>
+    </div>
+    <div class="header-actions">
+      <a href="page1.html" class="btn-hdr btn-hdr-solid">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        طلب جديد
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2d9e5f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div><div class="stat-num" id="statTotal">0</div><div class="stat-lbl">إجمالي الطلبات</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div><div class="stat-num" id="statReview">0</div><div class="stat-lbl">قيد المراجعة</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2d9e5f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div><div class="stat-num" id="statAccept">0</div><div class="stat-lbl">مقبولة</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      </div>
+      <div><div class="stat-num" id="statAmount">$0</div><div class="stat-lbl">إجمالي المبالغ المطلوبة</div></div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="ابحث باسم، رقم جوال، رقم طلب، بلد..."/>
+    </div>
+    <div class="select-mini-wrap">
+      <select class="filter-select" id="statusFilter">
+        <option value="">جميع الحالات</option>
+        <option value="قيد المراجعة">قيد المراجعة</option>
+        <option value="مقبول">مقبول</option>
+        <option value="مرفوض">مرفوض</option>
+      </select>
+    </div>
+    <div class="select-mini-wrap">
+      <select class="filter-select" id="countryFilter">
+        <option value="">جميع البلدان</option>
+      </select>
+    </div>
+    <div class="toolbar-right">
+      <span class="count-badge" id="countBadge">0 طلب</span>
+      <button class="btn-export" onclick="exportCSV()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        تصدير CSV
+      </button>
+      <button class="btn-clear-all" onclick="confirmClearAll()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        مسح الكل
+      </button>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card">
+    <div class="table-scroll">
+      <table id="requestsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>رقم الطلب</th>
+            <th>الاسم</th>
+            <th>الجوال</th>
+            <th>البلد</th>
+            <th>الجنسية</th>
+            <th>العمر</th>
+            <th>الحالة الاجتماعية</th>
+            <th>المبلغ (USD)</th>
+            <th>راتب</th>
+            <th>الحالة</th>
+            <th>تاريخ التقديم</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2d9e5f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <div class="empty-title">لا توجد طلبات بعد</div>
+      <div class="empty-sub">ستظهر الطلبات هنا فور تقديمها من صفحة النموذج</div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <h3>تفاصيل الطلب</h3>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-ref" id="modalRef"></div>
+      <div class="detail-grid" id="modalGrid"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-status btn-accept" id="modalAccept">قبول الطلب</button>
+      <button class="btn-status btn-reject" id="modalReject">رفض الطلب</button>
+      <button class="btn-status btn-delete" onclick="closeModalDirect()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<footer>© 2025 مركز الملك سلمان للإغاثة والأعمال الإنسانية &nbsp;|&nbsp; جميع الحقوق محفوظة</footer>
+
+<script>
+  let requests = [];
+  let filtered = [];
+  let currentIdx = null;
+
+  function loadData() {
+    requests = JSON.parse(localStorage.getItem('ksrelief_requests') || '[]');
+    populateCountryFilter();
+    applyFilters();
+    updateStats();
+  }
+
+  function saveData() {
+    localStorage.setItem('ksrelief_requests', JSON.stringify(requests));
+  }
+
+  function populateCountryFilter() {
+    const sel = document.getElementById('countryFilter');
+    const countries = [...new Set(requests.map(r => r.country).filter(Boolean))];
+    sel.innerHTML = '<option value="">جميع البلدان</option>';
+    countries.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+  }
+
+  function updateStats() {
+    const total   = requests.length;
+    const review  = requests.filter(r => r.status === 'قيد المراجعة').length;
+    const accept  = requests.filter(r => r.status === 'مقبول').length;
+    const totalAmt= requests.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+    document.getElementById('statTotal').textContent  = total;
+    document.getElementById('statReview').textContent = review;
+    document.getElementById('statAccept').textContent = accept;
+    document.getElementById('statAmount').textContent = '$' + totalAmt.toLocaleString('en');
+  }
+
+  function applyFilters() {
+    const q       = document.getElementById('searchInput').value.trim().toLowerCase();
+    const status  = document.getElementById('statusFilter').value;
+    const country = document.getElementById('countryFilter').value;
+    filtered = requests.filter(r => {
+      const matchQ = !q || [r.fullName,r.phone,r.refNumber,r.country,r.nationality,r.residence]
+                            .some(f => (f||'').toLowerCase().includes(q));
+      const matchS = !status  || r.status === status;
+      const matchC = !country || r.country === country;
+      return matchQ && matchS && matchC;
+    });
+    renderTable();
+  }
+
+  function statusBadge(s) {
+    if (s === 'مقبول')        return `<span class="badge badge-accept"><span class="badge-dot"></span>${s}</span>`;
+    if (s === 'مرفوض')        return `<span class="badge badge-reject"><span class="badge-dot"></span>${s}</span>`;
+    return                           `<span class="badge badge-review"><span class="badge-dot"></span>${s}</span>`;
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    const empty = document.getElementById('emptyState');
+    document.getElementById('countBadge').textContent = filtered.length + ' طلب';
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map((r, i) => {
+      const realIdx = requests.indexOf(r);
+      return `<tr>
+        <td>${i + 1}</td>
+        <td><strong style="font-size:.8rem;color:var(--green-dark)">${r.refNumber||'—'}</strong></td>
+        <td><strong>${r.fullName||'—'}</strong></td>
+        <td style="direction:ltr;text-align:right">${r.phone||'—'}</td>
+        <td>${r.country||'—'}</td>
+        <td>${r.nationality||'—'}</td>
+        <td>${r.age||'—'}</td>
+        <td>${r.maritalStatus||'—'}${r.familySize && r.familySize!=='—' ? ' <span style="font-size:.75rem;color:var(--gray-mid)">('+r.familySize+' أفراد)</span>' : ''}</td>
+        <td><strong style="color:var(--green-dark)">$${Number(r.amount||0).toLocaleString('en')}</strong></td>
+        <td>${r.hasSalary||'—'}</td>
+        <td>${statusBadge(r.status)}</td>
+        <td style="font-size:.8rem;color:var(--gray-mid)">${r.submittedAt||'—'}</td>
+        <td>
+          <div class="action-cell">
+            <button class="btn-status btn-view"   onclick="viewRequest(${realIdx})">عرض</button>
+            <button class="btn-status btn-accept" onclick="setStatus(${realIdx},'مقبول')">قبول</button>
+            <button class="btn-status btn-reject" onclick="setStatus(${realIdx},'مرفوض')">رفض</button>
+            <button class="btn-status btn-delete" onclick="deleteRequest(${realIdx})">حذف</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function setStatus(idx, status) {
+    requests[idx].status = status;
+    saveData();
+    updateStats();
+    applyFilters();
+    showToast(status === 'مقبول' ? '✓ تم قبول الطلب' : '✕ تم رفض الطلب', status === 'مقبول' ? 'success' : 'error');
+  }
+
+  function deleteRequest(idx) {
+    if (!confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
+    requests.splice(idx, 1);
+    saveData();
+    populateCountryFilter();
+    updateStats();
+    applyFilters();
+    showToast('تم حذف الطلب', 'error');
+  }
+
+  function confirmClearAll() {
+    if (requests.length === 0) { showToast('لا توجد طلبات للحذف'); return; }
+    if (!confirm(`هل أنت متأكد من حذف جميع الطلبات (${requests.length})؟ لا يمكن التراجع عن هذا الإجراء.`)) return;
+    requests = [];
+    saveData();
+    populateCountryFilter();
+    updateStats();
+    applyFilters();
+    showToast('تم مسح جميع الطلبات', 'error');
+  }
+
+  function viewRequest(idx) {
+    currentIdx = idx;
+    const r = requests[idx];
+    document.getElementById('modalRef').textContent = 'رقم الطلب: ' + (r.refNumber||'—') + '  |  ' + (r.submittedAt||'');
+    const fields = [
+      ['الاسم الكامل',r.fullName],['رقم الجوال',r.phone],['العمر',r.age+' سنة'],
+      ['الجنسية',r.nationality],['البلد',r.country],['مكان الإقامة',r.residence],
+      ['الحالة الاجتماعية',r.maritalStatus],['عدد أفراد الأسرة',r.familySize],
+      ['راتب شهري',r.hasSalary],['المبلغ المطلوب','$'+Number(r.amount||0).toLocaleString('en')],
+      ['الأملاك',r.assets,'full'],
+    ];
+    document.getElementById('modalGrid').innerHTML = fields.map(([l,v,cls])=>`
+      <div class="detail-item ${cls==='full'?'detail-full':''}">
+        <div class="detail-lbl">${l}</div>
+        <div class="detail-val">${v||'—'}</div>
+      </div>`).join('');
+    document.getElementById('modalAccept').onclick = ()=>{ setStatus(idx,'مقبول'); closeModalDirect(); };
+    document.getElementById('modalReject').onclick = ()=>{ setStatus(idx,'مرفوض'); closeModalDirect(); };
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+  function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast ' + type;
+    setTimeout(()=>t.classList.add('show'),10);
+    setTimeout(()=>t.classList.remove('show'),3000);
+  }
+
+  function exportCSV() {
+    if (requests.length === 0) { showToast('لا توجد بيانات للتصدير'); return; }
+    const headers = ['رقم الطلب','الاسم','الجوال','البلد','الجنسية','الإقامة','الحالة الاجتماعية','أفراد الأسرة','العمر','راتب','المبلغ USD','الأملاك','الحالة','التاريخ'];
+    const rows = requests.map(r=>[
+      r.refNumber,r.fullName,r.phone,r.country,r.nationality,r.residence,
+      r.maritalStatus,r.familySize,r.age,r.hasSalary,r.amount,
+      (r.assets||'').replace(/,/g,'؛'),r.status,r.submittedAt
+    ].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
+    const csv = '\uFEFF' + [headers.join(','),...rows].join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+    a.download = 'ksrelief_requests_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    showToast('✓ تم تصدير الملف', 'success');
+  }
+
+  // Events
+  document.getElementById('searchInput').addEventListener('input', applyFilters);
+  document.getElementById('statusFilter').addEventListener('change', applyFilters);
+  document.getElementById('countryFilter').addEventListener('change', applyFilters);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+  // Load on start
+  loadData();
+</script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مركز الملك سلمان للإغاثة - تقديم طلب</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green-dark:  #1a6b3c;
+      --green-mid:   #2d9e5f;
+      --green-light: #e8f5ee;
+      --white:       #ffffff;
+      --gray-bg:     #f4f6f5;
+      --gray-light:  #e9ecef;
+      --gray-mid:    #6b7280;
+      --gray-dark:   #374151;
+      --gold:        #c9a84c;
+      --error:       #dc2626;
+      --shadow:      0 2px 16px rgba(26,107,60,0.10);
+      --radius:      12px;
+    }
+    html { font-size:17px; }
+    body { font-family:'Tajawal',sans-serif; background:var(--gray-bg); color:var(--gray-dark); min-height:100vh; direction:rtl; line-height:1.6; }
+
+    /* HEADER */
+    header { background:linear-gradient(135deg,var(--green-dark) 0%,#0f4a28 100%); color:#fff; position:relative; overflow:hidden; }
+    header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--gold),#e8c96b,var(--gold)); }
+    .header-inner { max-width:920px; margin:0 auto; padding:26px 24px 22px; display:flex; align-items:center; gap:18px; }
+    .logo-circle { width:68px; height:68px; border-radius:50%; background:rgba(255,255,255,0.10); border:2px solid rgba(201,168,76,0.55); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .logo-circle svg { width:36px; height:36px; }
+    .header-text h1 { font-size:1.45rem; font-weight:800; line-height:1.3; }
+    .header-text p  { font-size:0.82rem; color:rgba(255,255,255,0.65); margin-top:4px; font-weight:300; }
+    .header-nav { margin-right:auto; }
+    .btn-dash { display:inline-flex; align-items:center; gap:7px; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.3); color:#fff; border-radius:8px; padding:8px 16px; font-family:'Tajawal',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; text-decoration:none; transition:background .2s; }
+    .btn-dash:hover { background:rgba(255,255,255,0.22); }
+
+    /* PROGRESS */
+    .progress-wrap { background:#fff; border-bottom:1px solid var(--gray-light); }
+    .progress-inner { max-width:920px; margin:0 auto; padding:13px 24px; display:flex; align-items:center; gap:10px; }
+    .step { display:flex; align-items:center; gap:7px; font-size:0.82rem; font-weight:500; }
+    .step-num { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; }
+    .step.active .step-num   { background:var(--green-mid); color:#fff; }
+    .step.active .step-label { color:var(--green-dark); font-weight:700; }
+    .step.pending .step-num  { background:var(--gray-light); color:var(--gray-mid); }
+    .step.pending .step-label{ color:var(--gray-mid); }
+    .step-line { flex:1; height:2px; background:var(--gray-light); border-radius:2px; }
+
+    /* MAIN */
+    main { max-width:920px; margin:30px auto 60px; padding:0 16px; }
+    .section-title { font-size:1.1rem; font-weight:700; color:var(--green-dark); border-right:4px solid var(--green-mid); padding-right:12px; margin-bottom:18px; }
+
+    /* CARD */
+    .card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:26px 28px; margin-bottom:18px; border:1px solid rgba(26,107,60,0.07); }
+
+    /* GRID */
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .grid-1 { display:grid; grid-template-columns:1fr; gap:16px; }
+    .phone-row { display:flex; gap:8px; }
+    @media(max-width:600px){
+      .header-inner { padding:18px 14px 16px; gap:12px; flex-wrap:wrap; }
+      .header-text { flex:1; min-width:0; }
+      .header-text h1 { font-size:1.1rem; }
+      .header-text p { font-size:0.85rem; }
+      .logo-circle { width:50px; height:50px; }
+      .header-nav { width:100%; margin:0; }
+      .btn-dash { width:100%; justify-content:center; font-size:0.95rem; }
+      .progress-inner { padding:12px 14px; }
+      .step { font-size:0.85rem; }
+      main { margin:20px auto 40px; padding:0 10px; }
+      .grid-2 { grid-template-columns:1fr; }
+      .card { padding:20px 15px; margin-bottom:14px; }
+      .section-title { font-size:1.15rem; }
+      .phone-row { flex-direction:column; }
+      .phone-row .select-wrap { flex-basis:auto !important; }
+      .radio-group { flex-direction:column; gap:10px; }
+      .radio-option { min-height:42px; padding:8px 10px; border:1px solid var(--gray-light); border-radius:8px; }
+      .radio-option input[type=radio] { width:20px; height:20px; }
+      .btn-submit { width:100%; justify-content:center; padding:15px 20px; font-size:1.1rem; }
+      .amount-note { align-items:flex-start; font-size:0.95rem; }
+      footer { font-size:0.85rem; padding:16px 12px; }
+    }
+
+    /* FIELD */
+    .field { display:flex; flex-direction:column; gap:6px; }
+    label { font-size:0.95rem; font-weight:600; color:var(--gray-dark); }
+    label .req { color:var(--error); margin-right:2px; }
+    input[type=text], input[type=number], input[type=tel], select, textarea {
+      width:100%; padding:12px 14px; border:1.5px solid var(--gray-light); border-radius:8px;
+      font-family:'Tajawal',sans-serif; font-size:1rem; color:var(--gray-dark); background:#fff;
+      transition:border-color .2s, box-shadow .2s; outline:none; appearance:none; -webkit-appearance:none;
+    }
+    input:focus, select:focus, textarea:focus { border-color:var(--green-mid); box-shadow:0 0 0 3px rgba(45,158,95,0.12); }
+    input.error, select.error, textarea.error { border-color:var(--error); box-shadow:0 0 0 3px rgba(220,38,38,0.08); }
+    .error-msg { font-size:0.85rem; color:var(--error); display:none; }
+    .error-msg.show { display:block; }
+    textarea { resize:vertical; min-height:88px; font-size:1rem; }
+
+    /* SELECT ARROW */
+    .select-wrap { position:relative; }
+    .select-wrap::after { content:'▾'; position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--gray-mid); pointer-events:none; font-size:0.9rem; }
+    .select-wrap select { padding-left:30px; }
+
+    /* RADIO */
+    .radio-group { display:flex; gap:16px; flex-wrap:wrap; }
+    .radio-option { display:flex; align-items:center; gap:8px; cursor:pointer; }
+    .radio-option input[type=radio] { width:18px; height:18px; accent-color:var(--green-mid); cursor:pointer; flex-shrink:0; }
+    .radio-option span { font-size:0.95rem; font-weight:500; }
+
+    /* HINT */
+    .field-hint { font-size:0.77rem; color:var(--gray-mid); }
+
+    /* CONDITIONAL */
+    .conditional { overflow:hidden; transition:max-height .35s ease, opacity .35s ease; }
+    .conditional.hidden  { max-height:0; opacity:0; pointer-events:none; }
+    .conditional.visible { max-height:200px; opacity:1; }
+
+    /* AMOUNT NOTE */
+    .amount-note { background:var(--green-light); border:1px solid rgba(45,158,95,0.25); border-radius:8px; padding:12px 14px; font-size:0.9rem; color:var(--green-dark); display:flex; align-items:center; gap:8px; }
+
+    /* SUBMIT */
+    .submit-wrap { text-align:center; margin-top:8px; }
+    .btn-submit { display:inline-flex; align-items:center; gap:10px; background:linear-gradient(135deg,var(--green-mid),var(--green-dark)); color:#fff; border:none; border-radius:10px; padding:14px 50px; font-family:'Tajawal',sans-serif; font-size:1.05rem; font-weight:700; cursor:pointer; box-shadow:0 4px 18px rgba(26,107,60,0.28); transition:transform .15s, box-shadow .15s; }
+    .btn-submit:hover { transform:translateY(-2px); box-shadow:0 6px 22px rgba(26,107,60,0.36); }
+    .btn-submit:active { transform:translateY(0); }
+
+    footer { text-align:center; padding:18px; font-size:0.77rem; color:var(--gray-mid); border-top:1px solid var(--gray-light); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-circle">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" stroke="#c9a84c" stroke-width="1.5"/>
+        <path d="M10 22 Q20 8 30 22" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M13 28 Q20 18 27 28" stroke="#c9a84c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <circle cx="20" cy="14" r="3" fill="white"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>مركز الملك سلمان للإغاثة والأعمال الإنسانية</h1>
+      <p>نموذج تقديم طلب المساعدة الإنسانية</p>
+    </div>
+    <div class="header-nav">
+      <a href="dashboard.html" class="btn-dash">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        لوحة التحكم
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="step active"><div class="step-num">١</div><div class="step-label">تقديم الطلب</div></div>
+    <div class="step-line"></div>
+    <div class="step pending"><div class="step-num">٢</div><div class="step-label">تأكيد الإرسال</div></div>
+  </div>
+</div>
+
+<main>
+  <form id="requestForm" novalidate>
+
+    <!-- البيانات الشخصية -->
+    <div class="card">
+      <div class="section-title">البيانات الشخصية</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="fullName">اسم مقدم الطلب <span class="req">*</span></label>
+          <input type="text" id="fullName" placeholder="الاسم الكامل"/>
+          <span class="error-msg" id="err-fullName">الرجاء إدخال الاسم الكامل</span>
+        </div>
+        <div class="field">
+          <label for="phone">رقم الجوال <span class="req">*</span></label>
+          <div class="phone-row">
+            <div class="select-wrap" style="flex:0 0 100px;">
+              <select id="countryCode">
+                <option value="+963">سوريا +963</option>
+                <option value="+964">العراق +964</option>
+                <option value="+970">فلسطين +970</option>
+                <option value="+972">إسرائيل +972</option>
+                <option value="+20">مصر +20</option>
+                <option value="+961">لبنان +961</option>
+              </select>
+            </div>
+            <input type="tel" id="phone" placeholder="مثال: 963xxxxxxxxx" style="flex:1;"/>
+          </div>
+          <span class="error-msg" id="err-phone">الرجاء إدخال رقم جوال صحيح</span>
+        </div>
+        <div class="field">
+          <label for="age">العمر <span class="req">*</span></label>
+          <input type="number" id="age" placeholder="السن بالسنوات" min="1" max="120"/>
+          <span class="error-msg" id="err-age">الرجاء إدخال عمر صحيح</span>
+        </div>
+        <div class="field">
+          <label for="nationality">الجنسية <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="nationality">
+              <option value="">-- اختر الجنسية --</option>
+              <option value="سوري">سوريا</option>
+              <option value="عراقي">العراق</option>
+              <option value="لبناني">لبنان</option>
+              <option value="فلسطيني">فلسطين</option>
+              <option value="إسرائيلي">إسرائيل</option>
+            </select>
+          </div>
+          <span class="error-msg" id="err-nationality">الرجاء إدخال الجنسية</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- معلومات الإقامة -->
+    <div class="card">
+      <div class="section-title">معلومات الإقامة</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="country">البلد <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="country">
+              <option value="">-- اختر البلد --</option>
+              <option>المملكة العربية السعودية</option><option>اليمن</option><option>سوريا</option>
+              <option>فلسطين</option><option>لبنان</option><option>الأردن</option><option>العراق</option>
+              <option>السودان</option><option>الصومال</option><option>ليبيا</option>
+              <option>أفغانستان</option><option>باكستان</option><option>مصر</option>
+              <option>المغرب</option><option>تونس</option><option>موريتانيا</option>
+              <option>النيجر</option><option>مالي</option><option>إثيوبيا</option><option>أخرى</option>
+            </select>
+          </div>
+          <span class="error-msg" id="err-country">الرجاء اختيار البلد</span>
+        </div>
+        <div class="field">
+          <label for="residence">مكان الإقامة الحالي <span class="req">*</span></label>
+          <input type="text" id="residence" placeholder="المدينة / المنطقة / المخيم"/>
+          <span class="error-msg" id="err-residence">الرجاء إدخال مكان الإقامة</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- الحالة الاجتماعية -->
+    <div class="card">
+      <div class="section-title">الحالة الاجتماعية</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="maritalStatus">الحالة الاجتماعية <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="maritalStatus" onchange="toggleFamilySize()">
+              <option value="">-- اختر --</option>
+              <option value="single">أعزب / عزباء</option>
+              <option value="married">متزوج / متزوجة</option>
+            </select>
+          </div>
+          <span class="error-msg" id="err-maritalStatus">الرجاء اختيار الحالة الاجتماعية</span>
+        </div>
+        <div class="field conditional hidden" id="familySizeField">
+          <label for="familySize">عدد أفراد الأسرة <span class="req">*</span></label>
+          <input type="number" id="familySize" placeholder="عدد الأفراد شامل مقدم الطلب" min="1" max="50"/>
+          <span class="error-msg" id="err-familySize">الرجاء إدخال عدد أفراد الأسرة</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- الوضع المالي -->
+    <div class="card">
+      <div class="section-title">الوضع المالي</div>
+      <div class="grid-1">
+        <div class="field">
+          <label>هل لديك راتب شهري؟ <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" name="hasSalary" value="yes"/><span>نعم، لديّ راتب</span></label>
+            <label class="radio-option"><input type="radio" name="hasSalary" value="no"/><span>لا، ليس لديّ راتب</span></label>
+          </div>
+          <span class="error-msg" id="err-hasSalary">الرجاء تحديد هذا الخيار</span>
+        </div>
+        <div class="field">
+          <label>هل لديك أملاك؟ <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" name="hasAssets" value="yes" onchange="toggleAssetsField()"/><span>لديّ أملاك</span></label>
+            <label class="radio-option"><input type="radio" name="hasAssets" value="no" onchange="toggleAssetsField()"/><span>ليس لديّ أملاك</span></label>
+          </div>
+          <span class="error-msg" id="err-hasAssets">الرجاء تحديد هذا الخيار</span>
+        </div>
+        <div class="field conditional hidden" id="assetsField">
+          <label for="assets">اذكر ما تمتلكه <span class="req">*</span></label>
+          <textarea id="assets" placeholder='اذكر ما تمتلكه من عقارات أو سيارات أو غيرها.'></textarea>
+          <span class="error-msg" id="err-assets">الرجاء ملء هذا الحقل</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- المبلغ المطلوب -->
+    <div class="card">
+      <div class="section-title">تفاصيل الطلب</div>
+      <div class="grid-1">
+        <div class="amount-note">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+          الحد الأقصى للمبلغ المسموح بطلبه هو <strong>15,000 دولار أمريكي</strong> فقط.
+        </div>
+        <div class="field">
+          <label for="amount">المبلغ الذي تحتاجه لتغطية احتياجاتك (USD) <span class="req">*</span></label>
+          <input type="number" id="amount" placeholder="أدخل المبلغ المطلوب" min="1" max="15000"/>
+          <span class="field-hint">الحد الأقصى: 15,000 دولار</span>
+          <span class="error-msg" id="err-amount">الرجاء إدخال مبلغ صحيح لا يتجاوز 15,000 دولار</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button type="submit" class="btn-submit">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        إرسال الطلب
+      </button>
+    </div>
+  </form>
+</main>
+
+<footer>© 2025 مركز الملك سلمان للإغاثة والأعمال الإنسانية &nbsp;|&nbsp; جميع الحقوق محفوظة</footer>
+
+<script>
+  function toggleFamilySize() {
+    const val = document.getElementById('maritalStatus').value;
+    const f   = document.getElementById('familySizeField');
+    if (val === 'married') { f.classList.remove('hidden'); f.classList.add('visible'); }
+    else { f.classList.remove('visible'); f.classList.add('hidden'); document.getElementById('familySize').value = ''; }
+  }
+
+  function toggleAssetsField() {
+    const checked = document.querySelector('input[name="hasAssets"]:checked');
+    if (!checked) return;
+    const val = checked.value;
+    const f   = document.getElementById('assetsField');
+    if (val === 'yes') { f.classList.remove('hidden'); f.classList.add('visible'); }
+    else { f.classList.remove('visible'); f.classList.add('hidden'); document.getElementById('assets').value = ''; }
+  }
+
+  function setError(id, errId, show) {
+    const el = document.getElementById(id), err = document.getElementById(errId);
+    el.classList.toggle('error', show); err.classList.toggle('show', show);
+    return !show;
+  }
+
+  function validate() {
+    let ok = true;
+    ok = setError('fullName',     'err-fullName',     document.getElementById('fullName').value.trim().length < 3)       && ok;
+    ok = setError('phone',        'err-phone',        !/^\+?[\d\s\-]{7,20}$/.test(document.getElementById('phone').value.trim())) && ok;
+    const age = parseInt(document.getElementById('age').value);
+    ok = setError('age',          'err-age',          isNaN(age)||age<1||age>120) && ok;
+    ok = setError('nationality',  'err-nationality',  !document.getElementById('nationality').value)    && ok;
+    ok = setError('country',      'err-country',      !document.getElementById('country').value)                         && ok;
+    ok = setError('residence',    'err-residence',    document.getElementById('residence').value.trim().length < 2)      && ok;
+    const ms = document.getElementById('maritalStatus').value;
+    ok = setError('maritalStatus','err-maritalStatus',!ms) && ok;
+    if (ms === 'married') {
+      const fs = parseInt(document.getElementById('familySize').value);
+      ok = setError('familySize','err-familySize', isNaN(fs)||fs<1) && ok;
+    }
+    const sal = document.querySelector('input[name="hasSalary"]:checked');
+    document.getElementById('err-hasSalary').classList.toggle('show', !sal);
+    if (!sal) ok = false;
+    
+    const hasAssets = document.querySelector('input[name="hasAssets"]:checked');
+    document.getElementById('err-hasAssets').classList.toggle('show', !hasAssets);
+    if (!hasAssets) ok = false;
+    
+    if (hasAssets && hasAssets.value === 'yes') {
+      ok = setError('assets','err-assets', document.getElementById('assets').value.trim().length < 2) && ok;
+    }
+    
+    const amt = parseFloat(document.getElementById('amount').value);
+    ok = setError('amount','err-amount', isNaN(amt)||amt<=0||amt>15000) && ok;
+    return ok;
+  }
+
+  function genRef() {
+    const d=new Date(), yy=d.getFullYear().toString().slice(-2),
+          mm=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+    return `KSR-${yy}${mm}${dd}-${Math.floor(1000+Math.random()*9000)}`;
+  }
+
+  document.getElementById('requestForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!validate()) { document.querySelector('.error')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+    const ms     = document.getElementById('maritalStatus');
+    const nat    = document.getElementById('nationality');
+    const refNum = genRef();
+    const data   = {
+      refNumber:    refNum,
+      submittedAt:  new Date().toLocaleString('ar-SA'),
+      status:       'قيد المراجعة',
+      fullName:     document.getElementById('fullName').value.trim(),
+      phone:        document.getElementById('countryCode').value + document.getElementById('phone').value.trim(),
+      age:          document.getElementById('age').value,
+      nationality:  nat.options[nat.selectedIndex].text,
+      country:      document.getElementById('country').value,
+      residence:    document.getElementById('residence').value.trim(),
+      maritalStatus: ms.options[ms.selectedIndex].text,
+      familySize:   document.getElementById('familySize').value || '—',
+      hasSalary:    document.querySelector('input[name="hasSalary"]:checked').value === 'yes' ? 'نعم' : 'لا',
+      assets:       document.querySelector('input[name="hasAssets"]:checked').value === 'yes'
+                      ? document.getElementById('assets').value.trim()
+                      : 'لا يوجد',
+      amount:       document.getElementById('amount').value,
+    };
+
+    // Save to localStorage
+    const existing = JSON.parse(localStorage.getItem('ksrelief_requests') || '[]');
+    existing.unshift(data); // newest first
+    localStorage.setItem('ksrelief_requests', JSON.stringify(existing));
+
+    // Pass current request for page2
+    sessionStorage.setItem('ksrelief_current', JSON.stringify(data));
+    window.location.href = 'page2.html';
+  });
+
+  // Clear errors on input
+  ['fullName','phone','age','nationality','country','residence','maritalStatus','familySize','assets','amount'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', () => {
+      el.classList.remove('error');
+      const e2 = document.getElementById('err-'+id); if (e2) e2.classList.remove('show');
+    });
+  });
+</script>
+</body>
+</html>
