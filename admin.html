@@ -63,30 +63,74 @@
       padding:7px 16px;
       font-weight:700;
     }
-    .table-card {
+    .requests-grid {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:18px;
+    }
+    .request-card {
+      position:relative;
+      overflow:hidden;
+      background:var(--white);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 8px 25px rgba(20,83,45,.08);
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .request-card:hover {
+      transform:translateY(-4px);
+      box-shadow:0 14px 35px rgba(20,83,45,.14);
+    }
+    .card-head {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:18px;
+      background:linear-gradient(135deg,var(--green-dark),#17683a);
+      color:#fff;
+    }
+    .card-number {
+      width:38px;
+      height:38px;
+      flex-shrink:0;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:rgba(255,255,255,.15);
+      border:1px solid rgba(255,255,255,.25);
+      font-weight:800;
+    }
+    .card-name {
+      min-width:0;
+      margin:0;
+      font-size:1.05rem;
+      line-height:1.35;
+      overflow-wrap:anywhere;
+    }
+    .card-body { padding:8px 18px 12px; }
+    .info-row {
+      display:grid;
+      grid-template-columns:110px minmax(0,1fr);
+      gap:10px;
+      padding:10px 0;
+      border-bottom:1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom:0; }
+    .info-label { color:var(--muted); font-size:.86rem; font-weight:600; }
+    .info-value { color:#1f2937; font-size:.92rem; font-weight:700; overflow-wrap:anywhere; }
+    .phone-value { direction:ltr; text-align:right; }
+    .card-date {
+      padding:11px 18px;
+      background:#f8faf9;
+      border-top:1px solid var(--border);
+      color:var(--muted);
+      font-size:.82rem;
+    }
+    .state {
+      grid-column:1/-1;
       background:var(--white);
       border:1px solid var(--border);
       border-radius:14px;
-      overflow:hidden;
-      box-shadow:0 8px 30px rgba(20,83,45,.08);
-    }
-    .table-scroll { overflow-x:auto; }
-    table { width:100%; min-width:940px; border-collapse:collapse; }
-    th {
-      background:var(--green-dark);
-      color:#fff;
-      padding:15px 14px;
-      text-align:right;
-      font-size:.9rem;
-      white-space:nowrap;
-    }
-    td { padding:14px; border-bottom:1px solid var(--border); vertical-align:middle; }
-    tbody tr:hover { background:#f8fbf9; }
-    tbody tr:last-child td { border-bottom:0; }
-    .name { font-weight:700; color:var(--green-dark); }
-    .phone { direction:ltr; text-align:right; white-space:nowrap; }
-    .date { color:var(--muted); font-size:.88rem; white-space:nowrap; }
-    .state {
       padding:48px 20px;
       text-align:center;
       color:var(--muted);
@@ -99,6 +143,11 @@
       .back-link { padding:7px 11px; font-size:.85rem; }
       main { width:calc(100% - 20px); padding-top:22px; }
       .summary { align-items:flex-start; }
+      .requests-grid { grid-template-columns:1fr; gap:14px; }
+      .info-row { grid-template-columns:105px minmax(0,1fr); }
+    }
+    @media (min-width:601px) and (max-width:950px) {
+      .requests-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
   </style>
 </head>
@@ -119,26 +168,8 @@
       <div class="count">العدد: <span id="requestCount">0</span></div>
     </div>
 
-    <div class="table-card">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>اسم مقدم الطلب</th>
-              <th>رقم الجوال</th>
-              <th>الجنسية</th>
-              <th>البلد</th>
-              <th>المدينة</th>
-              <th>الحالة الاجتماعية</th>
-              <th>تاريخ الإرسال</th>
-            </tr>
-          </thead>
-          <tbody id="requestsBody">
-            <tr><td colspan="8" class="state">جارٍ تحميل الطلبات...</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="requests-grid" id="requestsGrid">
+      <div class="state">جارٍ تحميل الطلبات...</div>
     </div>
   </main>
 
@@ -147,7 +178,7 @@
     import { getDatabase, onValue, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
     import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
 
-    const body = document.getElementById('requestsBody');
+    const grid = document.getElementById('requestsGrid');
     const count = document.getElementById('requestCount');
 
     function escapeHtml(value) {
@@ -173,7 +204,7 @@
     }
 
     if (!isFirebaseConfigured()) {
-      body.innerHTML = '<tr><td colspan="8" class="state error">يرجى إضافة إعدادات Firebase داخل ملف firebase-config.js.</td></tr>';
+      grid.innerHTML = '<div class="state error">يرجى إضافة إعدادات Firebase داخل ملف firebase-config.js.</div>';
     } else {
       const database = getDatabase(initializeApp(firebaseConfig));
 
@@ -186,25 +217,44 @@
         count.textContent = requests.length;
 
         if (!requests.length) {
-          body.innerHTML = '<tr><td colspan="8" class="state">لا توجد طلبات حتى الآن.</td></tr>';
+          grid.innerHTML = '<div class="state">لا توجد طلبات حتى الآن.</div>';
           return;
         }
 
-        body.innerHTML = requests.map((request,index) => `
-          <tr>
-            <td>${index + 1}</td>
-            <td class="name">${escapeHtml(request.name || request.fullName)}</td>
-            <td class="phone">${escapeHtml(request.phone)}</td>
-            <td>${escapeHtml(request.nationality)}</td>
-            <td>${escapeHtml(request.country)}</td>
-            <td>${escapeHtml(request.city || request.residence)}</td>
-            <td>${escapeHtml(request.maritalStatus)}</td>
-            <td class="date">${escapeHtml(formatDate(request.createdAt))}</td>
-          </tr>
+        grid.innerHTML = requests.map((request,index) => `
+          <article class="request-card">
+            <div class="card-head">
+              <div class="card-number">${index + 1}</div>
+              <h3 class="card-name">${escapeHtml(request.name || request.fullName)}</h3>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="info-label">رقم الجوال</span>
+                <span class="info-value phone-value">${escapeHtml(request.phone)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">الجنسية</span>
+                <span class="info-value">${escapeHtml(request.nationality)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">البلد</span>
+                <span class="info-value">${escapeHtml(request.country)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">المدينة</span>
+                <span class="info-value">${escapeHtml(request.city || request.residence)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">الحالة الاجتماعية</span>
+                <span class="info-value">${escapeHtml(request.maritalStatus || request.status)}</span>
+              </div>
+            </div>
+            <div class="card-date">تاريخ الإرسال: ${escapeHtml(formatDate(request.createdAt))}</div>
+          </article>
         `).join('');
       }, error => {
         console.error('Firebase read error:', error);
-        body.innerHTML = '<tr><td colspan="8" class="state error">تعذر تحميل الطلبات. تحقق من اتصال Firebase وقواعد قاعدة البيانات.</td></tr>';
+        grid.innerHTML = '<div class="state error">تعذر تحميل الطلبات. تحقق من اتصال Firebase وقواعد قاعدة البيانات.</div>';
       });
     }
   </script>
