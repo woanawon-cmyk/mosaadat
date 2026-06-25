@@ -57,7 +57,7 @@
     /* GRID */
     .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     .grid-1 { display:grid; grid-template-columns:1fr; gap:16px; }
-    .phone-row { display:flex; gap:8px; }
+    .phone-row { display:flex; flex-direction:column; gap:8px; }
     @media(max-width:600px){
       .header-inner { padding:18px 14px 16px; gap:12px; flex-wrap:wrap; }
       .header-text { flex:1; min-width:0; }
@@ -170,8 +170,25 @@
         </div>
         <div class="field">
           <label for="phone">رقم الجوال <span class="req">*</span></label>
-          <input type="tel" id="phone" placeholder="أدخل رقم الجوال مع رمز الدولة"/>
-          <span class="field-hint">أدخل رقم الجوال مع رمز الدولة</span>
+          <div class="phone-row">
+            <div class="select-wrap">
+              <select id="countryCode">
+                <option value="">-- اختر رمز الدولة --</option>
+                <option value="+963">سوريا (+963)</option>
+                <option value="+964">العراق (+964)</option>
+                <option value="+970">فلسطين (+970)</option>
+                <option value="+961">لبنان (+961)</option>
+                <option value="+249">السودان (+249)</option>
+                <option value="+252">الصومال (+252)</option>
+                <option value="+966">السعودية (+966)</option>
+                <option value="+20">مصر (+20)</option>
+                <option value="+216">تونس (+216)</option>
+                <option value="+962">الأردن (+962)</option>
+                <option value="+212">المغرب (+212)</option>
+              </select>
+            </div>
+            <input type="tel" id="phone" placeholder="أدخل رقم الجوال"/>
+          </div>
           <span class="error-msg" id="err-phone">الرجاء إدخال رقم جوال صحيح</span>
         </div>
         <div class="field">
@@ -427,7 +444,11 @@
   function validate() {
     let ok = true;
     ok = setError('fullName',     'err-fullName',     document.getElementById('fullName').value.trim().length < 3)       && ok;
-    ok = setError('phone',        'err-phone',        !/^\+?[\d\s\-]{7,20}$/.test(document.getElementById('phone').value.trim())) && ok;
+    const countryCode = document.getElementById('countryCode').value;
+    const phone = document.getElementById('phone').value.trim();
+    const phoneHasError = !countryCode || !/^[\d\s\-]{7,20}$/.test(phone);
+    ok = setError('phone',        'err-phone',        phoneHasError) && ok;
+    document.getElementById('countryCode').classList.toggle('error', phoneHasError);
     const age = parseInt(document.getElementById('age').value);
     ok = setError('age',          'err-age',          isNaN(age)||age<1||age>120) && ok;
     ok = setError('nationality',  'err-nationality',  !document.getElementById('nationality').value)    && ok;
@@ -481,7 +502,7 @@
       submittedAt:  new Date().toLocaleString('ar-SA'),
       status:       'قيد المراجعة',
       fullName:     document.getElementById('fullName').value.trim(),
-      phone:        document.getElementById('phone').value.trim(),
+      phone:        document.getElementById('countryCode').value + ' ' + document.getElementById('phone').value.trim(),
       age:          document.getElementById('age').value,
       nationality:  nat.options[nat.selectedIndex].text,
       country,
@@ -536,7 +557,7 @@
   });
 
   // Clear errors on input
-  ['fullName','phone','age','nationality','country','residence','maritalStatus','familySize','income','assets','amount'].forEach(id => {
+  ['fullName','phone','countryCode','age','nationality','country','residence','maritalStatus','familySize','income','assets','amount'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', () => {
       el.classList.remove('error');
