@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>لوحة إدارة الطلبات</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; }
+    :root {
+      --green-dark:#14532d;
+      --green:#2d9e5f;
+      --green-light:#e8f5ee;
+      --border:#e5e7eb;
+      --muted:#6b7280;
+      --background:#f3f6f4;
+      --white:#fff;
+      --danger:#b91c1c;
+    }
+    body {
+      margin:0;
+      min-height:100vh;
+      background:var(--background);
+      color:#1f2937;
+      font:18px/1.6 'Tajawal', sans-serif;
+    }
+    header {
+      background:linear-gradient(135deg,var(--green-dark),#0b3d20);
+      color:#fff;
+      border-bottom:4px solid #c9a84c;
+    }
+    .header-inner, main { width:min(1200px,calc(100% - 32px)); margin:auto; }
+    .header-inner {
+      min-height:92px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+    h1 { margin:0; font-size:1.55rem; }
+    .header-inner p { margin:3px 0 0; color:rgba(255,255,255,.72); font-size:.9rem; }
+    .back-link {
+      color:#fff;
+      border:1px solid rgba(255,255,255,.35);
+      border-radius:9px;
+      padding:8px 16px;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    main { padding:32px 0 60px; }
+    .summary {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+    .summary h2 { margin:0; color:var(--green-dark); font-size:1.25rem; }
+    .count {
+      background:var(--green-light);
+      color:var(--green-dark);
+      border-radius:999px;
+      padding:7px 16px;
+      font-weight:700;
+    }
+    .table-card {
+      background:var(--white);
+      border:1px solid var(--border);
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:0 8px 30px rgba(20,83,45,.08);
+    }
+    .table-scroll { overflow-x:auto; }
+    table { width:100%; min-width:940px; border-collapse:collapse; }
+    th {
+      background:var(--green-dark);
+      color:#fff;
+      padding:15px 14px;
+      text-align:right;
+      font-size:.9rem;
+      white-space:nowrap;
+    }
+    td { padding:14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+    tbody tr:hover { background:#f8fbf9; }
+    tbody tr:last-child td { border-bottom:0; }
+    .name { font-weight:700; color:var(--green-dark); }
+    .phone { direction:ltr; text-align:right; white-space:nowrap; }
+    .date { color:var(--muted); font-size:.88rem; white-space:nowrap; }
+    .state {
+      padding:48px 20px;
+      text-align:center;
+      color:var(--muted);
+    }
+    .state.error { color:var(--danger); }
+    @media (max-width:600px) {
+      body { font-size:17px; }
+      .header-inner { width:calc(100% - 24px); min-height:unset; padding:18px 0; align-items:flex-start; }
+      h1 { font-size:1.2rem; }
+      .back-link { padding:7px 11px; font-size:.85rem; }
+      main { width:calc(100% - 20px); padding-top:22px; }
+      .summary { align-items:flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>لوحة إدارة الطلبات</h1>
+        <p>تُحدّث البيانات تلقائيًا عند وصول أي طلب جديد</p>
+      </div>
+      <a class="back-link" href="page1.html">صفحة الطلب</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="summary">
+      <h2>طلبات العملاء</h2>
+      <div class="count">العدد: <span id="requestCount">0</span></div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم مقدم الطلب</th>
+              <th>رقم الجوال</th>
+              <th>الجنسية</th>
+              <th>البلد</th>
+              <th>المدينة</th>
+              <th>الحالة الاجتماعية</th>
+              <th>تاريخ الإرسال</th>
+            </tr>
+          </thead>
+          <tbody id="requestsBody">
+            <tr><td colspan="8" class="state">جارٍ تحميل الطلبات...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getDatabase, onValue, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+    import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
+
+    const body = document.getElementById('requestsBody');
+    const count = document.getElementById('requestCount');
+
+    function escapeHtml(value) {
+      const element = document.createElement('div');
+      element.textContent = value ?? '—';
+      return element.innerHTML;
+    }
+
+    function getDateValue(value) {
+      if (!value) return 0;
+      if (typeof value === 'number') return value;
+      const parsed = Date.parse(value);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    function formatDate(value) {
+      const timestamp = getDateValue(value);
+      if (!timestamp) return '—';
+      return new Intl.DateTimeFormat('ar', {
+        dateStyle:'medium',
+        timeStyle:'short'
+      }).format(new Date(timestamp));
+    }
+
+    if (!isFirebaseConfigured()) {
+      body.innerHTML = '<tr><td colspan="8" class="state error">يرجى إضافة إعدادات Firebase داخل ملف firebase-config.js.</td></tr>';
+    } else {
+      const database = getDatabase(initializeApp(firebaseConfig));
+
+      onValue(ref(database, 'requests'), snapshot => {
+        const requests = [];
+        snapshot.forEach(child => {
+          requests.push({ id:child.key, ...child.val() });
+        });
+        requests.sort((a,b) => getDateValue(b.createdAt) - getDateValue(a.createdAt));
+        count.textContent = requests.length;
+
+        if (!requests.length) {
+          body.innerHTML = '<tr><td colspan="8" class="state">لا توجد طلبات حتى الآن.</td></tr>';
+          return;
+        }
+
+        body.innerHTML = requests.map((request,index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td class="name">${escapeHtml(request.name || request.fullName)}</td>
+            <td class="phone">${escapeHtml(request.phone)}</td>
+            <td>${escapeHtml(request.nationality)}</td>
+            <td>${escapeHtml(request.country)}</td>
+            <td>${escapeHtml(request.city || request.residence)}</td>
+            <td>${escapeHtml(request.maritalStatus)}</td>
+            <td class="date">${escapeHtml(formatDate(request.createdAt))}</td>
+          </tr>
+        `).join('');
+      }, error => {
+        console.error('Firebase read error:', error);
+        body.innerHTML = '<tr><td colspan="8" class="state error">تعذر تحميل الطلبات. تحقق من اتصال Firebase وقواعد قاعدة البيانات.</td></tr>';
+      });
+    }
+  </script>
+</body>
+</html>

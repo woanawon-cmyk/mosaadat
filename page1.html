@@ -145,15 +145,6 @@
       <h1>مركز الملك سلمان للإغاثة والأعمال الإنسانية</h1>
       <p>نموذج تقديم طلب المساعدة الإنسانية</p>
     </div>
-    <div class="header-nav">
-      <a href="dashboard.html" class="btn-dash">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-        </svg>
-        لوحة التحكم
-      </a>
-    </div>
   </div>
 </header>
 
@@ -333,7 +324,16 @@
 
 <footer>© 2025 مركز الملك سلمان للإغاثة والأعمال الإنسانية &nbsp;|&nbsp; جميع الحقوق محفوظة</footer>
 
-<script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getDatabase, push, ref, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+  import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
+
+  let database = null;
+  if (isFirebaseConfigured()) {
+    database = getDatabase(initializeApp(firebaseConfig));
+  }
+
   const citiesByCountry = {
     'سوريا': ['دمشق (الشام)', 'ريف دمشق', 'درعا', 'السويداء', 'القنيطرة', 'حمص', 'حماة', 'حلب', 'إدلب', 'اللاذقية', 'طرطوس', 'الرقة', 'دير الزور', 'الحسكة'],
     'العراق': ['بغداد', 'البصرة', 'نينوى', 'أربيل', 'السليمانية', 'دهوك', 'كركوك', 'الأنبار', 'صلاح الدين', 'ديالى', 'بابل', 'كربلاء', 'النجف', 'واسط', 'ميسان', 'ذي قار', 'المثنى', 'القادسية'],
@@ -379,6 +379,9 @@
     else { f.classList.remove('visible'); f.classList.add('hidden'); document.getElementById('assets').value = ''; }
   }
 
+  window.toggleFamilySize = toggleFamilySize;
+  window.toggleAssetsField = toggleAssetsField;
+
   function setError(id, errId, show) {
     const el = document.getElementById(id), err = document.getElementById(errId);
     el.classList.toggle('error', show); err.classList.toggle('show', show);
@@ -423,13 +426,14 @@
     return `KSR-${yy}${mm}${dd}-${Math.floor(1000+Math.random()*9000)}`;
   }
 
-  document.getElementById('requestForm').addEventListener('submit', function(e) {
+  document.getElementById('requestForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     if (!validate()) { document.querySelector('.error')?.scrollIntoView({behavior:'smooth',block:'center'}); return; }
 
     const ms     = document.getElementById('maritalStatus');
     const nat    = document.getElementById('nationality');
     const refNum = genRef();
+    const submitButton = document.querySelector('.btn-submit');
     const data   = {
       refNumber:    refNum,
       submittedAt:  new Date().toLocaleString('ar-SA'),
@@ -449,14 +453,38 @@
       amount:       document.getElementById('amount').value,
     };
 
-    // Save to localStorage
-    const existing = JSON.parse(localStorage.getItem('ksrelief_requests') || '[]');
-    existing.unshift(data); // newest first
-    localStorage.setItem('ksrelief_requests', JSON.stringify(existing));
+    if (!database) {
+      alert('يرجى إضافة إعدادات مشروع Firebase داخل ملف firebase-config.js أولاً.');
+      return;
+    }
 
-    // Pass current request for page2
-    sessionStorage.setItem('ksrelief_current', JSON.stringify(data));
-    window.location.href = 'page2.html';
+    submitButton.disabled = true;
+    submitButton.textContent = 'جارٍ إرسال الطلب...';
+
+    try {
+      await push(ref(database, 'requests'), {
+        name: data.fullName,
+        phone: data.phone,
+        nationality: data.nationality,
+        country: data.country,
+        city: data.residence,
+        maritalStatus: ms.value === 'single' ? 'أعزب' : 'غير أعزب',
+        createdAt: serverTimestamp()
+      });
+
+      sessionStorage.setItem('ksrelief_current', JSON.stringify(data));
+      window.location.href = 'page2.html';
+    } catch (error) {
+      console.error('Firebase save error:', error);
+      alert('تعذر إرسال الطلب. تحقق من الاتصال وإعدادات Firebase ثم حاول مجددًا.');
+      submitButton.disabled = false;
+      submitButton.innerHTML = `
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        إرسال الطلب
+      `;
+    }
   });
 
   // Clear errors on input
