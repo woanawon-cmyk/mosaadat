@@ -246,6 +246,24 @@
       return digits ? `https://wa.me/${digits}` : '';
     }
 
+    function getRequestPhoneKey(phone) {
+      if (!phone) return '';
+      let digits = String(phone).replace(/\D/g, '');
+      if (digits.startsWith('00')) digits = digits.slice(2);
+      return digits;
+    }
+
+    function removeDuplicateRequests(requests) {
+      const seenPhones = new Set();
+      return requests.filter(request => {
+        const phoneKey = getRequestPhoneKey(request.phone);
+        if (!phoneKey) return true;
+        if (seenPhones.has(phoneKey)) return false;
+        seenPhones.add(phoneKey);
+        return true;
+      });
+    }
+
     if (!isFirebaseConfigured()) {
       grid.innerHTML = '<div class="state error">يرجى إضافة إعدادات Firebase داخل ملف firebase-config.js.</div>';
     } else {
@@ -257,14 +275,15 @@
           requests.push({ id:child.key, ...child.val() });
         });
         requests.sort((a,b) => getDateValue(b.createdAt) - getDateValue(a.createdAt));
-        count.textContent = requests.length;
+        const uniqueRequests = removeDuplicateRequests(requests);
+        count.textContent = uniqueRequests.length;
 
-        if (!requests.length) {
+        if (!uniqueRequests.length) {
           grid.innerHTML = '<div class="state">لا توجد طلبات حتى الآن.</div>';
           return;
         }
 
-        grid.innerHTML = requests.map((request,index) => {
+        grid.innerHTML = uniqueRequests.map((request,index) => {
           const isViewed = request.viewed === true;
           const whatsappUrl = getWhatsappUrl(request.phone);
 
