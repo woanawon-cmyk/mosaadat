@@ -121,13 +121,16 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
+      flex-wrap:wrap;
       gap:10px;
       padding:14px 18px 18px;
       border-top:1px solid var(--border);
     }
     .view-button,
-    .whatsapp-button {
-      width:100%;
+    .whatsapp-button,
+    .template-button {
+      flex:1 1 120px;
+      min-width:0;
       border:0;
       border-radius:10px;
       padding:10px 14px;
@@ -144,6 +147,8 @@
     .view-button.is-viewed:hover { background:#15803d; }
     .whatsapp-button { background:#22c55e; }
     .whatsapp-button:hover { background:#16a34a; transform:translateY(-1px); }
+    .template-button { background:#c9a84c; color:#111827; }
+    .template-button:hover { background:#d4b055; transform:translateY(-1px); }
     .whatsapp-button.is-disabled {
       pointer-events:none;
       background:#475569;
@@ -180,6 +185,7 @@
       .summary { align-items:flex-start; }
       .requests-grid { grid-template-columns:1fr; gap:14px; }
       .card-actions { flex-direction:column; }
+      .card-actions > * { width:100%; }
       .info-row { grid-template-columns:105px minmax(0,1fr); }
     }
     @media (min-width:601px) and (max-width:950px) {
@@ -237,6 +243,10 @@
         dateStyle:'medium',
         timeStyle:'short'
       }).format(new Date(timestamp));
+    }
+
+    function getTemplateUrl(requestId) {
+      return `receipt.html?requestId=${encodeURIComponent(requestId)}`;
     }
 
     function getWhatsappUrl(phone) {
@@ -320,6 +330,9 @@
               </div>
             </div>
             <div class="card-actions">
+              <a class="template-button" href="${escapeHtml(getTemplateUrl(request.id))}" target="_blank" rel="noopener">
+                إشعار الاستلام
+              </a>
               <a class="whatsapp-button${whatsappUrl ? '' : ' is-disabled'}" href="${escapeHtml(whatsappUrl || '#')}" target="_blank" rel="noopener">
                 محادثة واتساب
               </a>

@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إشعار استلام حوالة مالية دولية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(255,255,255,0.22), transparent 34%),
+                linear-gradient(135deg, #34568b 0%, #243b55 100%);
+            padding: 12px;
+            min-height: 100vh;
+            direction: rtl;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 12px;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.34);
+            overflow: hidden;
+        }
+
+        .input-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 12px;
+            color: white;
+        }
+
+        .input-section h2 {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            font-size: 17px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 11px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            direction: rtl;
+            text-align: right;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .print-button {
+            width: 100%;
+            padding: 12px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 6px;
+        }
+
+        .print-button:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        .print-button:active {
+            transform: translateY(0);
+        }
+
+        .document-section {
+            padding: 18px;
+            background: #f3f6f8;
+            position: relative;
+        }
+
+        .document-border {
+            border: 4px double #1f3f5b;
+            padding: 24px;
+            position: relative;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,252,253,0.98)),
+                #ffffff;
+            box-shadow:
+                inset 0 0 0 1px #d7e1e8,
+                inset 0 0 0 8px #ffffff,
+                0 10px 28px rgba(31, 63, 91, 0.16);
+        }
+
+        .document-border::before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border: 1px solid #8aa1b3;
+            pointer-events: none;
+        }
+
+        .document-border::after {
+            content: '';
+            position: absolute;
+            inset: 18px;
+            border-top: 3px solid #1f7a4f;
+            border-bottom: 3px solid #1f7a4f;
+            opacity: 0.28;
+            pointer-events: none;
+        }
+
+        .document-header {
+            text-align: center;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 3px double #1f3f5b;
+            position: relative;
+            z-index: 1;
+        }
+
+        .document-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: #163247;
+            margin-bottom: 10px;
+            text-decoration: underline;
+            text-decoration-color: #1f7a4f;
+            text-underline-offset: 8px;
+            text-decoration-thickness: 2px;
+        }
+
+        .document-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .document-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .document-content {
+            line-height: 1.85;
+            font-size: 19px;
+            color: #182f42;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .greeting {
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        /* النص الغامق بدل التظليل */
+        .bold-value {
+            font-weight: 900;
+            color: #071923;
+            font-size: 1.05em;
+            text-decoration: underline;
+            text-decoration-color: #1f7a4f;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 4px;
+        }
+
+        .intro-text {
+            margin-bottom: 14px;
+            text-align: justify;
+            line-height: 1.9;
+        }
+
+        .details-title {
+            font-weight: 900;
+            margin-bottom: 12px;
+            font-size: 20px;
+            color: #163247;
+        }
+
+        .detail-item {
+            margin-bottom: 10px;
+            padding-right: 20px;
+            position: relative;
+            line-height: 1.85;
+        }
+
+        .detail-item::before {
+            content: '◆';
+            position: absolute;
+            right: 0;
+            color: #1f7a4f;
+            font-weight: bold;
+        }
+
+        .detail-label {
+            font-weight: 900;
+            color: #102f46;
+        }
+
+        .note-section {
+            background: #fff8db;
+            border-right: 6px solid #c99619;
+            padding: 14px 16px;
+            margin: 14px 0;
+            border-radius: 7px;
+            box-shadow: inset 0 0 0 1px rgba(201, 150, 25, 0.22);
+            font-size: 19px;
+            line-height: 1.8;
+        }
+
+        .note-section strong {
+            color: #704b00;
+            font-weight: 900;
+        }
+
+        .document-footer {
+            margin-top: 14px;
+            padding-top: 10px;
+            border-top: 2px solid #9dafbb;
+            position: relative;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+
+        .signature-box {
+            text-align: center;
+            flex: 1;
+            min-width: 140px;
+            margin: 4px;
+        }
+
+        .regards {
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 18px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .signature-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .signature-title {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .handwritten-signature {
+            width: 130px;
+            height: 34px;
+            margin: 2px auto;
+        }
+
+        .handwritten-signature svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .official-stamp {
+            position: relative;
+            width: 62px;
+            height: 62px;
+            margin: 0 auto;
+        }
+
+        .official-stamp img {
+            width: 100%;
+            height: 100%;
+            opacity: 0.85;
+        }
+
+        .signature-line {
+            border-top: 2px solid #2c3e50;
+            width: 130px;
+            margin: 3px auto 3px;
+        }
+
+        /* طباعة - صفحة واحدة */
+        @media print {
+            @page {
+                size: A4;
+                margin: 5mm;
+            }
+
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                overflow: hidden;
+            }
+
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            .input-section,
+            .print-button {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 100%;
+                width: 100%;
+                height: auto;
+                max-height: 285mm;
+                overflow: hidden;
+                page-break-inside: avoid;
+                page-break-after: avoid;
+            }
+
+            .document-section {
+                padding: 2mm;
+                background: white;
+            }
+
+            .document-border {
+                padding: 6mm;
+                border-width: 2px;
+                box-shadow: none;
+            }
+
+            .document-border::before {
+                inset: 3mm;
+            }
+
+            .document-border::after {
+                inset: 4.5mm;
+                border-top-width: 1.5px;
+                border-bottom-width: 1.5px;
+            }
+
+            .document-header {
+                margin-bottom: 4mm;
+                padding-bottom: 3mm;
+            }
+
+            .document-logo {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 3mm;
+            }
+
+            .document-title {
+                font-size: 16px;
+                margin-bottom: 3mm;
+                text-underline-offset: 4px;
+            }
+
+            .document-content {
+                font-size: 11.5px;
+                line-height: 1.42;
+            }
+
+            .greeting {
+                font-size: 12px;
+                margin-bottom: 2mm;
+            }
+
+            .bold-value {
+                font-size: 1.05em;
+            }
+
+            .intro-text {
+                margin-bottom: 2mm;
+                line-height: 1.35;
+            }
+
+            .details-title {
+                font-size: 12px;
+                margin-bottom: 2mm;
+            }
+
+            .detail-item {
+                margin-bottom: 1.5mm;
+                padding-right: 10px;
+                line-height: 1.35;
+                font-size: 11.5px;
+            }
+
+            .note-section {
+                padding: 2mm 3mm;
+                margin: 2mm 0;
+                border-right-width: 3px;
+                font-size: 11.5px;
+                line-height: 1.35;
+            }
+
+            .document-footer {
+                margin-top: 3mm;
+                padding-top: 2mm;
+            }
+
+            .signature-section {
+                margin-top: 2mm;
+            }
+
+            .signature-box {
+                margin: 1mm;
+            }
+
+            .regards {
+                margin-bottom: 1mm;
+                font-size: 11.5px;
+            }
+
+            .handwritten-signature {
+                width: 100px;
+                height: 26px;
+            }
+
+            .official-stamp {
+                width: 50px;
+                height: 50px;
+            }
+
+            .signature-line {
+                width: 100px;
+                margin: 1mm auto;
+            }
+
+            .signature-name {
+                font-size: 10px;
+                margin-bottom: 1mm;
+            }
+
+            .signature-title {
+                font-size: 9px;
+            }
+        }
+
+        /* الهاتف المحمول */
+        @media (max-width: 768px) {
+            html, body {
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
+
+            body {
+                padding: 4px;
+            }
+
+            .container {
+                width: 100%;
+                max-width: 100vw;
+                border-radius: 8px;
+                overflow-x: hidden;
+            }
+
+            .input-section {
+                padding: 14px;
+            }
+
+            .input-section h2 {
+                font-size: 18px;
+            }
+
+            .form-group label {
+                font-size: 14px;
+            }
+
+            .form-group input {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            .print-button {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            .document-section {
+                padding: 8px;
+            }
+
+            .document-border {
+                width: 100%;
+                max-width: 100%;
+                padding: 16px 12px;
+                overflow: hidden;
+            }
+
+            .document-border::before {
+                inset: 7px;
+            }
+
+            .document-border::after {
+                inset: 11px;
+            }
+
+            .document-title {
+                font-size: 24px;
+            }
+
+            .document-logo {
+                width: 65px;
+                height: 65px;
+            }
+
+            .document-content {
+                font-size: 18px;
+                line-height: 1.85;
+                max-width: 100%;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            .document-content *,
+            .detail-item,
+            .intro-text,
+            .note-section {
+                max-width: 100%;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            .greeting {
+                font-size: 19px;
+            }
+
+            .details-title {
+                font-size: 19px;
+            }
+
+            .detail-item {
+                line-height: 1.85;
+                margin-bottom: 10px;
+                font-size: 18px;
+            }
+
+            .note-section {
+                padding: 12px;
+                margin: 12px 0;
+                font-size: 18px;
+            }
+
+            .signature-section {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-around;
+                margin-top: 4px;
+                gap: 4px;
+                flex-wrap: nowrap;
+                width: 100%;
+                overflow: hidden;
+            }
+
+            .signature-box {
+                flex: 0 1 48%;
+                min-width: 0;
+                margin: 4px 0;
+                max-width: 48%;
+            }
+
+            .official-stamp {
+                width: 55px;
+                height: 55px;
+                max-width: 100%;
+            }
+
+            .handwritten-signature {
+                width: 110px;
+                height: 30px;
+                max-width: 100%;
+            }
+
+            .signature-line {
+                width: min(110px, 100%);
+            }
+
+            .document-logo img,
+            .official-stamp img,
+            .handwritten-signature svg {
+                display: block;
+                max-width: 100%;
+            }
+
+            .regards {
+                margin-bottom: 4px;
+                font-size: 16px;
+            }
+
+            .signature-name {
+                font-size: 14px;
+            }
+
+            .signature-title {
+                font-size: 12px;
+            }
+        }
+
+        /* شاشات صغيرة جداً */
+        @media (max-width: 380px) {
+            .document-border {
+                padding: 14px 10px;
+            }
+
+            .document-title {
+                font-size: 21px;
+            }
+
+            .document-content {
+                font-size: 16px;
+                line-height: 1.75;
+            }
+
+            .greeting,
+            .details-title {
+                font-size: 17px;
+            }
+
+            .detail-item {
+                font-size: 16px;
+            }
+
+            .note-section {
+                font-size: 16px;
+            }
+
+            .document-logo {
+                width: 55px;
+                height: 55px;
+            }
+
+            .official-stamp {
+                width: 48px;
+                height: 48px;
+            }
+
+            .handwritten-signature {
+                width: 90px;
+                height: 26px;
+            }
+
+            .signature-line {
+                width: min(90px, 100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- قسم الإدخال -->
+        <div class="input-section">
+            <h2>📝 أدخل البيانات المطلوبة</h2>
+
+            <div class="form-group">
+                <label for="nameInput">الاسم الكامل:</label>
+                <input type="text" id="nameInput" placeholder="أدخل الاسم الكامل">
+            </div>
+
+            <div class="form-group">
+                <label for="phoneInput">رقم الهاتف:</label>
+                <input type="text" id="phoneInput" placeholder="أدخل رقم الهاتف">
+            </div>
+
+            <div class="form-group">
+                <label for="countryInput">الدولة:</label>
+                <input type="text" id="countryInput" placeholder="أدخل اسم الدولة">
+            </div>
+
+            <button class="print-button" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+        </div>
+
+        <!-- قسم المستند -->
+        <div class="document-section">
+            <div class="document-border">
+                <div class="document-header">
+                    <div class="document-logo">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cdefs%3E%3ClinearGradient id='greenGrad' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23006C35;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%2300923F;stop-opacity:1' /%3E%3C/linearGradient%3E%3CradialGradient id='coinGrad' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' style='stop-color:%23FFD700;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23FFA500;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23FF8C00;stop-opacity:1' /%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='300' height='300' fill='url(%23greenGrad)'/%3E%3Ccircle cx='150' cy='110' r='75' fill='none' stroke='white' stroke-width='3'/%3E%3Ccircle cx='150' cy='110' r='60' fill='none' stroke='white' stroke-width='2'/%3E%3Ccircle cx='150' cy='110' r='40' fill='url(%23coinGrad)' stroke='%23DAA520' stroke-width='2'/%3E%3Ccircle cx='150' cy='110' r='35' fill='none' stroke='%23DAA520' stroke-width='1' stroke-dasharray='3,2'/%3E%3Ctext x='150' y='108' font-family='Arial' font-size='18' font-weight='bold' fill='%23006C35' text-anchor='middle'%3E1%3C/text%3E%3Ctext x='150' y='123' font-family='Arial' font-size='10' font-weight='bold' fill='%23006C35' text-anchor='middle'%3ESAR%3C/text%3E%3Cpath id='outerCircle' d='M 150,35 A 75,75 0 1,1 149.99,35' fill='none'/%3E%3Cpath id='innerCircle' d='M 150,50 A 60,60 0 0,0 149.99,50' fill='none'/%3E%3Ctext font-family='Arial' font-size='11' font-weight='bold' fill='white'%3E%3CtextPath href='%23outerCircle' startOffset='50%25' text-anchor='middle'%3E%D8%A7%D9%84%D8%A8%D9%86%D9%83 %D8%A7%D9%84%D8%B3%D8%B9%D9%88%D8%AF%D9%8A %D8%A7%D9%84%D9%85%D8%B1%D9%83%D8%B2%D9%8A%3C/textPath%3E%3C/text%3E%3Ctext font-family='Arial' font-size='9' font-weight='bold' fill='white'%3E%3CtextPath href='%23innerCircle' startOffset='50%25' text-anchor='middle'%3E%D9%84%D8%A7 %D8%A5%D9%84%D9%87 %D8%A5%D9%84%D8%A7 %D8%A7%D9%84%D9%84%D9%87%3C/textPath%3E%3C/text%3E%3Ctext x='150' y='205' font-family='Arial' font-size='13' font-weight='bold' fill='white' text-anchor='middle'%3E%D8%A7%D9%84%D8%A8%D9%86%D9%83 %D8%A7%D9%84%D9%85%D8%B1%D9%83%D8%B2%D9%8A %D8%A7%D9%84%D8%B3%D8%B9%D9%88%D8%AF%D9%8A%3C/text%3E%3Cline x1='60' y1='220' x2='130' y2='220' stroke='white' stroke-width='2'/%3E%3Cline x1='170' y1='220' x2='240' y2='220' stroke='white' stroke-width='2'/%3E%3Ctext x='150' y='240' font-family='Arial' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3ESAMA%3C/text%3E%3Ctext x='150' y='260' font-family='Arial' font-size='10' fill='white' text-anchor='middle'%3ESAUDI CENTRAL BANK%3C/text%3E%3C/svg%3E" alt="شعار البنك المركزي السعودي">
+                    </div>
+                    <h1 class="document-title">إشعار استلام حوالة مالية دولية</h1>
+                </div>
+
+                <div class="document-content">
+                    <div class="greeting">
+                        عزيزي السيد/ السيدة <span class="bold-value" id="displayName">_______________</span>
+                    </div>
+
+                    <p class="intro-text">
+                        نحيطكم علماً بأنه قد تم إيداع مبلغ مالي وقدره <strong>18,000 ريال سعودي</strong> (ما يعادل <strong>5,000 دولار أمريكي</strong>) لصالح حسابكم. نبارك لكم هذا المبلغ ونتمنى لكم الاستفادة منه بكل خير.
+                    </p>
+
+                    <p class="details-title">يرجى الاطلاع على تفاصيل عملية الاستلام أدناه:</p>
+
+                    <div class="detail-item">
+                        <span class="detail-label">رقم الطلب:</span> <span class="bold-value" id="displayRequestNumber">20240903</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">رقم الهاتف:</span> <span class="bold-value" id="displayPhone">_______________</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">الدولة:</span> <span class="bold-value" id="displayCountry">_______________</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">جهة الاستلام:</span> شركة الهرم للحوالات المالية.
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">فترة الصلاحية:</span> نود التنويه إلى أن هذا المبلغ متاح للاستلام خلال <strong>12 ساعة فقط</strong> من تاريخه، وبعد انقضاء هذه المدة سيعاد المبلغ إلى مصدره تلقائياً.
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">رسوم تحويل العملة:</span> تبلغ قيمة رسوم تحويل المبلغ من الريال السعودي إلى الدولار الأمريكي <strong>50 دولاراً أمريكياً</strong>.
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label">الإجراء المطلوب:</span> يتوجب سداد رسوم التحويل مسبقاً (50 دولاراً) عبر خدمة "شام كاش" لضمان إتمام العملية وتجنب أي تعقيدات قانونية تتعلق بلوائح غسيل الأموال وضمان سير المعاملة وفقاً للأنظمة المتبعة.
+                    </div>
+
+                    <div class="note-section">
+                        <strong>ملاحظة:</strong> يرجى تأكيد جاهزيتكم لإتمام عملية التحويل خلال الفترة الزمنية المحددة (12 ساعة)، وذلك لنقوم بتزويدكم ببيانات حساب "شام كاش" المعتمد لإرسال الرسوم.
+                    </div>
+
+                    <div class="document-footer">
+                        <p class="regards">مع التقدير،</p>
+
+                        <div class="signature-section">
+                            <div class="signature-box">
+                                <div class="handwritten-signature">
+                                    <svg viewBox="0 0 220 70" xmlns="http://www.w3.org/2000/svg">
+                                        <text x="110" y="40"
+                                              font-family="'Brush Script MT', 'Lucida Handwriting', cursive"
+                                              font-size="26"
+                                              fill="#1a5490"
+                                              text-anchor="middle"
+                                              font-weight="bold"
+                                              font-style="italic"
+                                              transform="rotate(-5 110 40)">
+                                            فادي القاضي
+                                        </text>
+                                        <path d="M 20 30 Q 110 22, 200 28"
+                                              stroke="#1a5490"
+                                              stroke-width="2.5"
+                                              fill="none"
+                                              stroke-linecap="round"
+                                              opacity="0.85"/>
+                                        <path d="M 60 25 Q 110 8, 160 25"
+                                              stroke="#1a5490"
+                                              stroke-width="2.2"
+                                              fill="none"
+                                              stroke-linecap="round"
+                                              opacity="0.8"
+                                              transform="rotate(-8 110 20)"/>
+                                    </svg>
+                                </div>
+                                <div class="signature-line"></div>
+                                <p class="signature-name">فادي القاضي أبو منصور</p>
+                                <p class="signature-title">البنك المركزي السعودي</p>
+                            </div>
+
+                            <div class="signature-box">
+                                <div class="official-stamp">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cdefs%3E%3CradialGradient id='coinStampGrad' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' style='stop-color:%23FFD700;stop-opacity:0.3' /%3E%3Cstop offset='50%25' style='stop-color:%23FFA500;stop-opacity:0.4' /%3E%3Cstop offset='100%25' style='stop-color:%23FF8C00;stop-opacity:0.5' /%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='150' cy='110' r='75' fill='none' stroke='%23006C35' stroke-width='4' opacity='0.7'/%3E%3Ccircle cx='150' cy='110' r='60' fill='none' stroke='%23006C35' stroke-width='2.5' opacity='0.7'/%3E%3Ccircle cx='150' cy='110' r='40' fill='url(%23coinStampGrad)' stroke='%23DAA520' stroke-width='2' opacity='0.6'/%3E%3Ccircle cx='150' cy='110' r='35' fill='none' stroke='%23DAA520' stroke-width='1' stroke-dasharray='3,2' opacity='0.6'/%3E%3Ctext x='150' y='108' font-family='Arial' font-size='18' font-weight='bold' fill='%23006C35' text-anchor='middle' opacity='0.7'%3E1%3C/text%3E%3Ctext x='150' y='123' font-family='Arial' font-size='10' font-weight='bold' fill='%23006C35' text-anchor='middle' opacity='0.7'%3ESAR%3C/text%3E%3Cpath id='outerPath' d='M 150,35 A 75,75 0 1,1 149.99,35' fill='none'/%3E%3Cpath id='innerPath' d='M 150,50 A 60,60 0 0,0 149.99,50' fill='none'/%3E%3Ctext font-family='Arial' font-size='11' font-weight='bold' fill='%23006C35' opacity='0.7'%3E%3CtextPath href='%23outerPath' startOffset='50%25' text-anchor='middle'%3E%D8%A7%D9%84%D8%A8%D9%86%D9%83 %D8%A7%D9%84%D8%B3%D8%B9%D9%88%D8%AF%D9%8A %D8%A7%D9%84%D9%85%D8%B1%D9%83%D8%B2%D9%8A%3C/textPath%3E%3C/text%3E%3Ctext font-family='Arial' font-size='9' font-weight='bold' fill='%23006C35' opacity='0.7'%3E%3CtextPath href='%23innerPath' startOffset='50%25' text-anchor='middle'%3E%D9%84%D8%A7 %D8%A5%D9%84%D9%87 %D8%A5%D9%84%D8%A7 %D8%A7%D9%84%D9%84%D9%87%3C/textPath%3E%3C/text%3E%3Ctext x='150' y='205' font-family='Arial' font-size='13' font-weight='bold' fill='%23006C35' text-anchor='middle' opacity='0.7'%3E%D8%A7%D9%84%D8%A8%D9%86%D9%83 %D8%A7%D9%84%D9%85%D8%B1%D9%83%D8%B2%D9%8A %D8%A7%D9%84%D8%B3%D8%B9%D9%88%D8%AF%D9%8A%3C/text%3E%3Cline x1='60' y1='220' x2='130' y2='220' stroke='%23006C35' stroke-width='2' opacity='0.7'/%3E%3Cline x1='170' y1='220' x2='240' y2='220' stroke='%23006C35' stroke-width='2' opacity='0.7'/%3E%3Ctext x='150' y='240' font-family='Arial' font-size='16' font-weight='bold' fill='%23006C35' text-anchor='middle' opacity='0.7'%3ESAMA%3C/text%3E%3Ctext x='150' y='260' font-family='Arial' font-size='10' fill='%23006C35' text-anchor='middle' opacity='0.7'%3ESAUDI CENTRAL BANK%3C/text%3E%3C/svg%3E" alt="ختم البنك المركزي السعودي">
+                                </div>
+                                <p class="signature-title" style="margin-top: 10px;">الختم الرسمي</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getDatabase, get, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+        import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
+
+        const nameInput = document.getElementById('nameInput');
+        const phoneInput = document.getElementById('phoneInput');
+        const countryInput = document.getElementById('countryInput');
+        const displayName = document.getElementById('displayName');
+        const displayPhone = document.getElementById('displayPhone');
+        const displayCountry = document.getElementById('displayCountry');
+        const displayRequestNumber = document.getElementById('displayRequestNumber');
+
+        function updateText(element, value) {
+            element.textContent = value || '_______________';
+        }
+
+        function formatLocalPhone(phone) {
+            const countryCodes = ['963', '964', '970', '961', '249', '252', '966', '20', '216', '962', '212'];
+            let digits = String(phone || '').replace(/\D/g, '');
+            if (!digits) return '';
+            if (digits.startsWith('00')) digits = digits.slice(2);
+
+            const countryCode = countryCodes.find(code => digits.startsWith(code));
+            if (countryCode) digits = digits.slice(countryCode.length);
+
+            digits = digits.replace(/^0+/, '');
+            return digits ? `0${digits}` : '';
+        }
+
+        function fillReceipt(request, requestId) {
+            const fullName = request.name || request.fullName || '';
+            const phone = formatLocalPhone(request.phone);
+            const country = request.country || '';
+            const requestNumber = request.refNumber || requestId || '20240903';
+
+            nameInput.value = fullName;
+            phoneInput.value = phone;
+            countryInput.value = country;
+
+            updateText(displayName, fullName);
+            updateText(displayPhone, phone);
+            updateText(displayCountry, country);
+            displayRequestNumber.textContent = requestNumber;
+
+            if (fullName) document.title = `إشعار استلام - ${fullName}`;
+        }
+
+        nameInput.addEventListener('input', function(e) {
+            updateText(displayName, e.target.value);
+        });
+
+        phoneInput.addEventListener('input', function(e) {
+            updateText(displayPhone, formatLocalPhone(e.target.value));
+        });
+
+        countryInput.addEventListener('input', function(e) {
+            updateText(displayCountry, e.target.value);
+        });
+
+        const requestId = new URLSearchParams(window.location.search).get('requestId');
+        if (requestId) {
+            if (!isFirebaseConfigured()) {
+                alert('يرجى إضافة إعدادات Firebase داخل ملف firebase-config.js حتى يتم تعبئة إشعار الاستلام تلقائياً.');
+            } else {
+                const database = getDatabase(initializeApp(firebaseConfig));
+                get(ref(database, `requests/${requestId}`)).then(snapshot => {
+                    if (!snapshot.exists()) {
+                        alert('تعذر العثور على بيانات هذا الطلب.');
+                        return;
+                    }
+
+                    fillReceipt(snapshot.val(), requestId);
+                }).catch(error => {
+                    console.error('Firebase read error:', error);
+                    alert('تعذر تحميل بيانات الطلب. تحقق من اتصال Firebase وقواعد قاعدة البيانات.');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
