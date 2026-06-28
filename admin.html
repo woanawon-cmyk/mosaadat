@@ -83,6 +83,13 @@
       border-color:#3157a5;
       box-shadow:0 16px 38px rgba(0,0,0,.5);
     }
+    .request-card.viewed {
+      border-color:#16a34a;
+      box-shadow:0 10px 30px rgba(22,163,74,.18);
+    }
+    .request-card.viewed .card-head {
+      background:linear-gradient(135deg,#052e16,#14532d);
+    }
     .card-head {
       display:flex;
       align-items:center;
@@ -110,6 +117,28 @@
       overflow-wrap:anywhere;
     }
     .card-body { padding:8px 18px 12px; }
+    .card-actions {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 18px 18px;
+      border-top:1px solid var(--border);
+    }
+    .view-button {
+      width:100%;
+      border:0;
+      border-radius:10px;
+      padding:10px 14px;
+      background:#2563eb;
+      color:#fff;
+      font:700 .92rem/1.4 'Tajawal', sans-serif;
+      cursor:pointer;
+      transition:background .2s ease, transform .2s ease;
+    }
+    .view-button:hover { background:#1d4ed8; transform:translateY(-1px); }
+    .view-button.is-viewed { background:#16a34a; }
+    .view-button.is-viewed:hover { background:#15803d; }
     .info-row {
       display:grid;
       grid-template-columns:110px minmax(0,1fr);
@@ -170,7 +199,7 @@
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import { getDatabase, onValue, ref } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+    import { getDatabase, onValue, ref, set } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
     import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
 
     const grid = document.getElementById('requestsGrid');
@@ -216,8 +245,11 @@
           return;
         }
 
-        grid.innerHTML = requests.map((request,index) => `
-          <article class="request-card">
+        grid.innerHTML = requests.map((request,index) => {
+          const isViewed = request.viewed === true;
+
+          return `
+          <article class="request-card${isViewed ? ' viewed' : ''}" data-request-id="${escapeHtml(request.id)}">
             <div class="card-head">
               <div class="card-number">${index + 1}</div>
               <h3 class="card-name">${escapeHtml(request.name || request.fullName)}</h3>
@@ -248,11 +280,35 @@
                 <span class="info-value">${request.income ? `${escapeHtml(Number(request.income).toLocaleString('ar'))} ${escapeHtml(request.incomeCurrency)}` : 'لا يوجد'}</span>
               </div>
             </div>
+            <div class="card-actions">
+              <button class="view-button${isViewed ? ' is-viewed' : ''}" type="button" data-viewed="${isViewed}">
+                ${isViewed ? 'تمت مشاهدة الطلب' : 'شفت الطلب'}
+              </button>
+            </div>
           </article>
-        `).join('');
+        `;
+        }).join('');
       }, error => {
         console.error('Firebase read error:', error);
         grid.innerHTML = '<div class="state error">تعذر تحميل الطلبات. تحقق من اتصال Firebase وقواعد قاعدة البيانات.</div>';
+      });
+
+      grid.addEventListener('click', event => {
+        const button = event.target.closest('.view-button');
+        if (!button) return;
+
+        const card = button.closest('.request-card');
+        const requestId = card?.dataset.requestId;
+        if (!requestId) return;
+
+        const nextViewed = button.dataset.viewed !== 'true';
+        button.disabled = true;
+
+        set(ref(database, `requests/${requestId}/viewed`), nextViewed).catch(error => {
+          console.error('Firebase update error:', error);
+          button.disabled = false;
+          alert('تعذر تحديث حالة الطلب. تحقق من اتصال Firebase وقواعد قاعدة البيانات.');
+        });
       });
     }
   </script>
