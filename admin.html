@@ -64,6 +64,28 @@
       padding:7px 16px;
       font-weight:700;
     }
+    .admin-toolbar {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .search-box {
+      position:relative;
+      flex:1;
+    }
+    .search-box input {
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:10px;
+      background:#111827;
+      color:#f8fafc;
+      padding:11px 14px;
+      font:600 .95rem/1.4 'Tajawal', sans-serif;
+      outline:none;
+    }
+    .search-box input::placeholder { color:#94a3b8; }
+    .search-box input:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.2); }
     .requests-grid {
       display:grid;
       grid-template-columns:repeat(3,minmax(0,1fr));
@@ -128,7 +150,8 @@
     }
     .view-button,
     .whatsapp-button,
-    .template-button {
+    .template-button,
+    .delete-button {
       flex:1 1 120px;
       min-width:0;
       border:0;
@@ -149,6 +172,8 @@
     .whatsapp-button:hover { background:#16a34a; transform:translateY(-1px); }
     .template-button { background:#c9a84c; color:#111827; }
     .template-button:hover { background:#d4b055; transform:translateY(-1px); }
+    .delete-button { background:#7f1d1d; }
+    .delete-button:hover { background:#b91c1c; transform:translateY(-1px); }
     .whatsapp-button.is-disabled {
       pointer-events:none;
       background:#475569;
@@ -242,6 +267,7 @@
       .back-link { padding:7px 11px; font-size:.85rem; }
       main { width:calc(100% - 20px); padding-top:22px; }
       .summary { align-items:flex-start; }
+      .admin-toolbar { margin-bottom:14px; }
       .requests-grid { grid-template-columns:1fr; gap:14px; }
       .card-actions {
         display:grid;
@@ -258,14 +284,16 @@
       }
       .view-button,
       .whatsapp-button,
-      .template-button {
+      .template-button,
+      .delete-button {
         flex:none;
         border-radius:8px;
         padding:8px 10px;
         font-size:.78rem;
         line-height:1.35;
       }
-      .view-button { grid-column:1/-1; }
+      .view-button,
+      .delete-button { grid-column:1/-1; }
       .info-row { grid-template-columns:105px minmax(0,1fr); }
     }
     @media (min-width:601px) and (max-width:950px) {
@@ -308,6 +336,12 @@
       <div class="count">العدد: <span id="requestCount">0</span></div>
     </div>
 
+    <div class="admin-toolbar">
+      <div class="search-box">
+        <input id="adminSearchInput" type="search" placeholder="ابحث بالاسم، رقم الجوال، البلد، الجنسية..."/>
+      </div>
+    </div>
+
     <div class="requests-grid" id="requestsGrid">
       <div class="state">جارٍ تحميل الطلبات...</div>
     </div>
@@ -316,11 +350,12 @@
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import { getDatabase, onValue, ref, set } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+    import { getDatabase, onValue, ref, set, remove } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
     import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
 
     const grid = document.getElementById('requestsGrid');
     const count = document.getElementById('requestCount');
+    const searchInput = document.getElementById('adminSearchInput');
     const loginScreen = document.getElementById('loginScreen');
     const adminApp = document.getElementById('adminApp');
     const loginForm = document.getElementById('loginForm');
@@ -331,6 +366,7 @@
     const validPassword = 'ahmad992003';
     const sessionKey = 'adminLoggedIn';
     let adminStarted = false;
+    let allRequests = [];
 
     function escapeHtml(value) {
       const element = document.createElement('div');
