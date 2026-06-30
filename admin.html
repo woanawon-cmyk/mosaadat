@@ -419,6 +419,93 @@
       });
     }
 
+    function requestMatchesSearch(request, query) {
+      if (!query) return true;
+      return [
+        request.name,
+        request.fullName,
+        request.phone,
+        request.nationality,
+        request.country,
+        request.city,
+        request.residence,
+        request.maritalStatus,
+        request.status,
+        request.id
+      ].some(value => String(value || '').toLowerCase().includes(query));
+    }
+
+    function renderRequests(requests) {
+      count.textContent = requests.length;
+
+      if (!allRequests.length) {
+        grid.innerHTML = '<div class="state">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†.</div>';
+        return;
+      }
+
+      if (!requests.length) {
+        grid.innerHTML = '<div class="state">لا توجد نتائج مطابقة للبحث.</div>';
+        return;
+      }
+
+      grid.innerHTML = requests.map((request,index) => {
+        const isViewed = request.viewed === true;
+        const whatsappUrl = getWhatsappUrl(request.phone);
+
+        return `
+          <article class="request-card${isViewed ? ' viewed' : ''}" data-request-id="${escapeHtml(request.id)}">
+            <div class="card-head">
+              <div class="card-number">${index + 1}</div>
+              <h3 class="card-name">${escapeHtml(request.name || request.fullName)}</h3>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="info-label">Ø±Ù‚Ù… Ø§Ù„Ø¬ÙˆØ§Ù„</span>
+                <span class="info-value phone-value">${escapeHtml(request.phone)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Ø§Ù„Ø¬Ù†Ø³ÙŠØ©</span>
+                <span class="info-value">${escapeHtml(request.nationality)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Ø§Ù„Ø¨Ù„Ø¯</span>
+                <span class="info-value">${escapeHtml(request.country)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Ø§Ù„Ù…Ø¯ÙŠÙ†Ø©</span>
+                <span class="info-value">${escapeHtml(request.city || request.residence)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ø§Ø¬ØªÙ…Ø§Ø¹ÙŠØ©</span>
+                <span class="info-value">${escapeHtml(request.maritalStatus || request.status)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Ø§Ù„Ø¯Ø®Ù„ Ø§Ù„Ø´Ù‡Ø±ÙŠ</span>
+                <span class="info-value">${request.income ? `${escapeHtml(Number(request.income).toLocaleString('ar'))} ${escapeHtml(request.incomeCurrency)}` : 'Ù„Ø§ ÙŠÙˆØ¬Ø¯'}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a class="template-button" href="${escapeHtml(getTemplateUrl(request.id))}" target="_blank" rel="noopener">
+                Ø¥Ø´Ø¹Ø§Ø± Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…
+              </a>
+              <a class="whatsapp-button${whatsappUrl ? '' : ' is-disabled'}" href="${escapeHtml(whatsappUrl || '#')}" target="_blank" rel="noopener">
+                Ù…Ø­Ø§Ø¯Ø«Ø© ÙˆØ§ØªØ³Ø§Ø¨
+              </a>
+              <button class="view-button${isViewed ? ' is-viewed' : ''}" type="button" data-viewed="${isViewed}">
+                ${isViewed ? 'ØªÙ…Øª Ù…Ø´Ø§Ù‡Ø¯Ø© Ø§Ù„Ø·Ù„Ø¨' : 'Ø´ÙØª Ø§Ù„Ø·Ù„Ø¨'}
+              </button>
+              <button class="delete-button" type="button">حذف</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function applySearch() {
+      const query = searchInput.value.trim().toLowerCase();
+      renderRequests(allRequests.filter(request => requestMatchesSearch(request, query)));
+    }
+
     function startAdmin() {
       if (adminStarted) return;
       adminStarted = true;
@@ -434,11 +521,13 @@
           requests.push({ id:child.key, ...child.val() });
         });
         requests.sort((a,b) => getDateValue(b.createdAt) - getDateValue(a.createdAt));
-        const uniqueRequests = removeDuplicateRequests(requests);
+        allRequests = removeDuplicateRequests(requests);
+        const query = searchInput.value.trim().toLowerCase();
+        const uniqueRequests = allRequests.filter(request => requestMatchesSearch(request, query));
         count.textContent = uniqueRequests.length;
 
         if (!uniqueRequests.length) {
-          grid.innerHTML = '<div class="state">لا توجد طلبات حتى الآن.</div>';
+          grid.innerHTML = allRequests.length ? '<div class="state">لا توجد نتائج مطابقة للبحث.</div>' : '<div class="state">لا توجد طلبات حتى الآن.</div>';
           return;
         }
 
@@ -488,6 +577,7 @@
               <button class="view-button${isViewed ? ' is-viewed' : ''}" type="button" data-viewed="${isViewed}">
                 ${isViewed ? 'تمت مشاهدة الطلب' : 'شفت الطلب'}
               </button>
+              <button class="delete-button" type="button">حذف</button>
             </div>
           </article>
         `;
@@ -498,6 +588,22 @@
       });
 
       grid.addEventListener('click', event => {
+        const deleteButton = event.target.closest('.delete-button');
+        if (deleteButton) {
+          const card = deleteButton.closest('.request-card');
+          const requestId = card?.dataset.requestId;
+          if (!requestId) return;
+          if (!confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
+
+          deleteButton.disabled = true;
+          remove(ref(database, `requests/${requestId}`)).catch(error => {
+            console.error('Firebase delete error:', error);
+            deleteButton.disabled = false;
+            alert('تعذر حذف الطلب. تحقق من اتصال Firebase وقواعد قاعدة البيانات.');
+          });
+          return;
+        }
+
         const button = event.target.closest('.view-button');
         if (!button) return;
 
@@ -540,6 +646,8 @@
       adminPassword.value = '';
       adminPassword.focus();
     });
+
+    searchInput.addEventListener('input', applySearch);
 
     if (sessionStorage.getItem(sessionKey) === 'true') {
       showAdmin();
