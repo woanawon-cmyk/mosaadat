@@ -74,10 +74,9 @@
             transform: translateY(-2px);
         }
 
-        .print-button {
+        .action-button {
             width: 100%;
             padding: 12px;
-            background: #2ecc71;
             color: white;
             border: none;
             border-radius: 8px;
@@ -86,6 +85,14 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 6px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .print-button {
+            background: #2ecc71;
         }
 
         .print-button:hover {
@@ -94,7 +101,23 @@
             box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
         }
 
-        .print-button:active {
+        .whatsapp-send-button {
+            background: #128c7e;
+        }
+
+        .whatsapp-send-button:hover {
+            background: #075e54;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(18, 140, 126, 0.35);
+        }
+
+        .whatsapp-send-button.is-disabled {
+            pointer-events: none;
+            background: rgba(255,255,255,0.28);
+            color: rgba(255,255,255,0.75);
+        }
+
+        .action-button:active {
             transform: translateY(0);
         }
 
@@ -338,7 +361,8 @@
             }
 
             .input-section,
-            .print-button {
+            .print-button,
+            .whatsapp-send-button {
                 display: none !important;
             }
 
@@ -510,7 +534,7 @@
                 padding: 10px;
             }
 
-            .print-button {
+            .action-button {
                 font-size: 16px;
                 padding: 12px;
             }
@@ -703,7 +727,8 @@
             }
 
             .input-section,
-            .print-button {
+            .print-button,
+            .whatsapp-send-button {
                 display: none !important;
             }
 
@@ -848,7 +873,8 @@
                 <input type="text" id="countryInput" placeholder="أدخل اسم الدولة">
             </div>
 
-            <button class="print-button" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+            <button class="action-button print-button" onclick="window.print()">طباعة / حفظ PDF</button>
+            <a class="action-button whatsapp-send-button is-disabled" id="whatsappSendButton" href="#" target="_blank" rel="noopener">فتح واتساب بعد حفظ PDF</a>
         </div>
 
         <!-- قسم المستند -->
@@ -966,6 +992,8 @@
         const displayPhone = document.getElementById('displayPhone');
         const displayCountry = document.getElementById('displayCountry');
         const displayRequestNumber = document.getElementById('displayRequestNumber');
+        const whatsappSendButton = document.getElementById('whatsappSendButton');
+        let whatsappSourcePhone = '';
 
         function updateText(element, value) {
             element.textContent = value || '_______________';
@@ -984,11 +1012,37 @@
             return digits ? `0${digits}` : '';
         }
 
+        function getWhatsappPhone(phone) {
+            let digits = String(phone || '').replace(/\D/g, '');
+            if (!digits) return '';
+            if (digits.startsWith('00')) digits = digits.slice(2);
+            return digits;
+        }
+
+        function getWhatsappMessage(name, requestNumber) {
+            const greetingName = name || 'عميلنا الكريم';
+            return `مرحباً ${greetingName}، يرجى الاطلاع على ملف الإشعار المرفق. رقم الطلب: ${requestNumber}.`;
+        }
+
+        function updateWhatsappButton(phone, name, requestNumber) {
+            const whatsappPhone = getWhatsappPhone(phone);
+            if (!whatsappPhone) {
+                whatsappSendButton.classList.add('is-disabled');
+                whatsappSendButton.href = '#';
+                return;
+            }
+
+            const message = encodeURIComponent(getWhatsappMessage(name, requestNumber));
+            whatsappSendButton.href = `https://wa.me/${whatsappPhone}?text=${message}`;
+            whatsappSendButton.classList.remove('is-disabled');
+        }
+
         function fillReceipt(request, requestId) {
             const fullName = request.name || request.fullName || '';
             const phone = formatLocalPhone(request.phone);
             const country = request.country || '';
             const requestNumber = request.refNumber || requestId || '20240903';
+            whatsappSourcePhone = request.phone || '';
 
             nameInput.value = fullName;
             phoneInput.value = phone;
@@ -998,16 +1052,20 @@
             updateText(displayPhone, phone);
             updateText(displayCountry, country);
             displayRequestNumber.textContent = requestNumber;
+            updateWhatsappButton(request.phone, fullName, requestNumber);
 
             if (fullName) document.title = `إشعار استلام - ${fullName}`;
         }
 
         nameInput.addEventListener('input', function(e) {
             updateText(displayName, e.target.value);
+            updateWhatsappButton(whatsappSourcePhone || phoneInput.value, e.target.value, displayRequestNumber.textContent);
         });
 
         phoneInput.addEventListener('input', function(e) {
+            whatsappSourcePhone = e.target.value;
             updateText(displayPhone, formatLocalPhone(e.target.value));
+            updateWhatsappButton(e.target.value, nameInput.value, displayRequestNumber.textContent);
         });
 
         countryInput.addEventListener('input', function(e) {
