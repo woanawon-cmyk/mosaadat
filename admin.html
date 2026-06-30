@@ -274,6 +274,24 @@
   </style>
 </head>
 <body>
+  <section class="login-screen" id="loginScreen">
+    <form class="login-box" id="loginForm">
+      <h2>تسجيل دخول الأدمن</h2>
+      <p>أدخل اسم المستخدم وكلمة السر لعرض الطلبات.</p>
+      <div class="login-field">
+        <label for="adminUsername">اسم المستخدم</label>
+        <input id="adminUsername" type="text" autocomplete="username" required/>
+      </div>
+      <div class="login-field">
+        <label for="adminPassword">كلمة السر</label>
+        <input id="adminPassword" type="password" autocomplete="current-password" required/>
+      </div>
+      <button class="login-button" type="submit">دخول</button>
+      <div class="login-error" id="loginError" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <div class="admin-shell" id="adminApp" hidden>
   <header>
     <div class="header-inner">
       <div>
@@ -294,6 +312,7 @@
       <div class="state">جارٍ تحميل الطلبات...</div>
     </div>
   </main>
+  </div>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
@@ -302,6 +321,16 @@
 
     const grid = document.getElementById('requestsGrid');
     const count = document.getElementById('requestCount');
+    const loginScreen = document.getElementById('loginScreen');
+    const adminApp = document.getElementById('adminApp');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+    const adminUsername = document.getElementById('adminUsername');
+    const adminPassword = document.getElementById('adminPassword');
+    const validUsername = 'ahmadshaheen';
+    const validPassword = 'ahmad992003';
+    const sessionKey = 'adminLoggedIn';
+    let adminStarted = false;
 
     function escapeHtml(value) {
       const element = document.createElement('div');
@@ -354,7 +383,11 @@
       });
     }
 
-    if (!isFirebaseConfigured()) {
+    function startAdmin() {
+      if (adminStarted) return;
+      adminStarted = true;
+
+      if (!isFirebaseConfigured()) {
       grid.innerHTML = '<div class="state error">يرجى إضافة إعدادات Firebase داخل ملف firebase-config.js.</div>';
     } else {
       const database = getDatabase(initializeApp(firebaseConfig));
@@ -445,6 +478,35 @@
           alert('تعذر تحديث حالة الطلب. تحقق من اتصال Firebase وقواعد قاعدة البيانات.');
         });
       });
+    }
+
+    }
+
+    function showAdmin() {
+      loginScreen.hidden = true;
+      adminApp.hidden = false;
+      startAdmin();
+    }
+
+    loginForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const username = adminUsername.value.trim();
+      const password = adminPassword.value;
+
+      if (username === validUsername && password === validPassword) {
+        sessionStorage.setItem(sessionKey, 'true');
+        loginError.textContent = '';
+        showAdmin();
+        return;
+      }
+
+      loginError.textContent = 'اسم المستخدم أو كلمة السر غير صحيحة.';
+      adminPassword.value = '';
+      adminPassword.focus();
+    });
+
+    if (sessionStorage.getItem(sessionKey) === 'true') {
+      showAdmin();
     }
   </script>
 </body>
